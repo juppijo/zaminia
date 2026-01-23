@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <title>Autogenes Training Übungsbegleiter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #ddd6fe 50%, #fce7f3 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        /* Home View Styles */
+        .home-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .home-header h1 {
+            font-size: 3rem;
+            color: #1e40af;
+            margin-bottom: 1rem;
+        }
+
+        .home-header h2 {
+            font-size: 2rem;
+            color: #3b82f6;
+            margin-bottom: 0.5rem;
+        }
+
+        .home-header p {
+            font-size: 1.2rem;
+            color: #60a5fa;
+        }
+
+        .card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card h3 {
+            color: #1e40af;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card p {
+            color: #374151;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .benefit-box {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #c070ff;
+        }
+
+        .benefit-box h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #1e40af;
+        }
+
+        .benefit-box ul {
+            list-style: none;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
+        .benefit-box ul li {
+            margin: 0.3rem 0;
+        }
+
+        .button-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-secondary {
+            background: #8b5cf6;
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: #7c3aed;
+        }
+
+        /* Overview View Styles */
+        .overview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .overview-header h2 {
+            color: #1e40af;
+            font-size: 2rem;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        .uebungen-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .uebung-card {
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .uebung-card .card-header {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .uebung-number {
+            background: white;
+            border-radius: 50%;
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1e40af;
+            flex-shrink: 0;
+        }
+
+        .uebung-card h3 {
+            font-size: 1.4rem;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .uebung-card .affirmation {
+            font-style: italic;
+            color: #6b7280;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .uebung-card .instruction {
+            color: #374151;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .uebung-card .effect-box {
+            background: rgba(255, 255, 255, 0.7);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+        }
+
+        .uebung-card .effect-box p {
+            font-size: 0.9rem;
+            color: #374151;
+            margin: 0;
+        }
+
+        /* Practice View Styles */
+        .practice-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-card {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 0.75rem;
+            background: #e5e7eb;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            transition: width 0.5s ease;
+            border-radius: 1rem;
+        }
+
+        .practice-main {
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            margin-bottom: 1.5rem;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .practice-main .text-center {
+            text-align: center;
+        }
+
+        .practice-main .uebung-number-large {
+            background: white;
+            border-radius: 50%;
+            width: 4rem;
+            height: 4rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1e40af;
+            margin-bottom: 1.5rem;
+        }
+
+        .practice-main h2 {
+            font-size: 2.5rem;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+
+        .practice-main .affirmation-large {
+            font-size: 1.5rem;
+            color: #4b5563;
+            font-style: italic;
+            font-weight: 500;
+            margin-bottom: 2rem;
+        }
+
+        .timer-container {
+            text-align: center;
+            margin: 2.5rem 0;
+        }
+
+        .timer-circle {
+            background: white;
+            border-radius: 50%;
+            width: 10rem;
+            height: 10rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            position: relative;
+        }
+
+        .timer-circle span {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #1e40af;
+        }
+
+        .timer-label {
+            font-size: 1rem;
+            color: #6b7280;
+            margin-top: 0.75rem;
+        }
+
+        .instruction-box {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .instruction-box h3 {
+            font-size: 1.3rem;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+
+        .instruction-box p {
+            color: #374151;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .controls-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn-control {
+            background: #e5e7eb;
+            border: none;
+            border-radius: 50%;
+            width: 3.5rem;
+            height: 3.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-control:hover:not(:disabled) {
+            background: #d1d5db;
+        }
+
+        .btn-control:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .btn-control.play {
+            background: #3b82f6;
+            width: 4.5rem;
+            height: 4.5rem;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-control.play:hover {
+            background: #2563eb;
+            transform: scale(1.05);
+        }
+
+        /* Complete View */
+        .complete-container {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .complete-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            max-width: 600px;
+        }
+
+        .complete-card .emoji {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .complete-card h2 {
+            font-size: 2.5rem;
+            color: #1e40af;
+            margin-bottom: 1rem;
+        }
+
+        .complete-card p {
+            font-size: 1.2rem;
+            color: #374151;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        /* Color classes */
+        .bg-blue { background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); }
+        .bg-purple { background: linear-gradient(135deg, #e9d5ff 0%, #ddd6fe 100%); }
+        .bg-pink { background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); }
+        .bg-indigo { background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); }
+
+        /* Midnight Space Schema für die Übungskarten */
+        .bg-dark-blue { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #e2e8f0; border: 1px solid #334155; }
+        .bg-dark-purple { background: linear-gradient(135deg, #2e1065 0%, #1e1b4b 100%); color: #e2e8f0; border: 1px solid #4c1d95; }
+        .bg-dark-indigo { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); color: #e2e8f0; border: 1px solid #312e81; }
+        .bg-dark-slate { background: linear-gradient(135deg, #0f172a 0%, #020617 100%); color: #e2e8f0; border: 1px solid #1e293b; }
+
+        /* Icons */
+        .icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Color option buttons */
+        .color-option {
+            background: white;
+            border: 3px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .color-option:hover {
+            border-color: #3b82f6;
+            transform: scale(1.05);
+        }
+
+        .color-option.active {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        /* Fullscreen button */
+        .fullscreen-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 3.5rem;
+            height: 3.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .fullscreen-btn:hover {
+            background: #2563eb;
+            transform: scale(1.1);
+        }
+
+        /* Breathing animation */
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .breathing {
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem; /* Weniger Rand am Handy-Bildschirm */
+            }
+
+            .home-header h1 {
+                font-size: 1.8rem; /* Etwas kleiner für schmale Displays */
+            }
+
+            .card {
+                padding: 1.2rem; /* Kompakterer Inhalt */
+            }
+
+            .uebungen-grid {
+                grid-template-columns: 1fr; /* Immer nur eine Übung pro Zeile */
+            }
+
+            .practice-main {
+                padding: 1.5rem;
+                min-height: auto; /* Flexiblere Höhe für kleine Bildschirme */
+            }
+
+            .timer-circle {
+                width: 7rem;
+                height: 7rem;
+            }
+
+            .timer-circle span {
+                font-size: 2.5rem;
+            }
+
+            /* Damit die Buttons unten gut erreichbar sind (Daumen-Bedienung) */
+            .controls {
+                gap: 2rem;
+            }
+
+            .btn-control.play {
+                width: 5rem;
+                height: 5rem;
+            }
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #f8fafc;
+        }
+
+        body.dark-mode .card, 
+        body.dark-mode .controls-card,
+        body.dark-mode .progress-card,
+        body.dark-mode .instruction-box {
+            background: #1e293b;
+            color: #f8fafc;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        body.dark-mode .card h3, 
+        body.dark-mode .home-header h1,
+        body.dark-mode .overview-header h2 {
+            color: #60a5fa;
+        }
+
+        body.dark-mode .card p,
+        body.dark-mode .benefit-box ul {
+            color: #cbd5e1;
+        }
+
+        /*Hier einfügen für die mobile Optimierung */
+        button, .btn, .btn-control, .color-option {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Home View -->
+        <div id="homeView" class="view active">
+            <div class="home-header">
+                <h1>Autogenes Training</h1>
+                <h2>Die 4 Grundübungen</h2>
+                <p>Entspannungsbegleiter   <img src="ZamiZen.jpg" alt="Zami Zen" width="140" height="80"></p>
+            </div>
+
+            <div class="card">
+                <h3>Willkommen zum Autogenen Training</h3>
+                <p>Das Autogene Training ist eine bewährte Entspannungsmethode, die durch Autosuggestion zur tiefen körperlichen und mentalen Entspannung führt. Die vier Grundübungen bilden die Basis dieser Technik und helfen Ihnen, Stress abzubauen und innere Ruhe zu finden.</p>
+                
+                <div class="benefits-grid">
+                    <div class="benefit-box">
+                        <h4>Wirkungen</h4>
+                        <ul>
+                            <li>• Tiefe Entspannung von Körper und Geist</li>
+                            <li>• Stressabbau und Angstlösung</li>
+                            <li>• Verbesserte Konzentration</li>
+                            <li>• Besserer Schlaf</li>
+                            <li>• Stärkung des Immunsystems</li>
+                            <li>• Regulierung von Atmung und Herzschlag</li>
+                        </ul>
+                    </div>
+                    <div class="benefit-box">
+                        <h4>Hinweise zur Praxis</h4>
+                        <ul>
+                            <li>• Suchen Sie sich einen ruhigen Ort</li>
+                            <li>• Üben Sie in bequemer Haltung</li>
+                            <li>• Lassen Sie sich Zeit für jede Übung</li>
+                            <li>• Atmen Sie ruhig und gleichmäßig</li>
+                            <li>• Üben Sie regelmäßig (2 x täglich)</li>
+                            <li>• Jede Übung dauert 40 Sekunden (Gesamt 3 Min. 40)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-grid">
+                <button class="btn btn-primary" onclick="startPractice()">
+                    <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    Übung starten
+                </button>
+                <button class="btn btn-secondary" onclick="showView('overviewView')">
+                    <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    Alle Übungen ansehen
+                </button>
+                <button class="btn btn-secondary" onclick="showView('settingsView')">
+                    <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v6m5.2-13.2l-4.2 4.2m0 6l-4.2 4.2M23 12h-6m-6 0H1m18.2-5.2l-4.2 4.2m0 6l-4.2 4.2"></path></svg>
+                    Einstellungen
+                </button>
+            </div>
+        </div>
+
+        <!-- Overview View -->
+        <div id="overviewView" class="view">
+            <div class="overview-header">
+                <h2>Die 4 Grundübungen im Überblick</h2>
+                <button class="btn btn-primary btn-small" onclick="showView('homeView')">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    Zurück
+                </button>
+            </div>
+
+            <div class="uebungen-grid" id="uebungenGrid"></div>
+        </div>
+
+        <!-- Practice View -->
+        <div id="practiceView" class="view">
+            <div class="practice-header">
+                <button class="btn btn-primary btn-small" onclick="showView('homeView'); stopPractice()">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    Home
+                </button>
+                <button class="btn btn-primary btn-small" onclick="toggleMusic()">
+                    <svg class="icon" id="musicIcon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path id="musicWaves" d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                    Musik
+                </button>
+            </div>
+
+            <div class="progress-card">
+                <div class="progress-info">
+                    <span>Übung <span id="currentNumber">1</span> von 4</span>
+                    <span id="progressPercent">0% abgeschlossen</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="practice-main" id="practiceMain">
+                <div class="text-center">
+                    <img src="ZamiZen1.jpg" alt="Zami Zen" width="210" height="120">
+                    <div class="uebung-number-large" id="practiceNumber">1</div>
+                    <h2 id="practiceName">Ruhe</h2>
+                    <p class="affirmation-large" id="practiceAffirmation">"Ich bin ganz ruhig"</p>
+                </div>
+
+                <div class="timer-container">
+                    <div class="timer-circle breathing">
+                        <span id="timerDisplay">40</span>
+                    </div>
+                    <p class="timer-label">Sekunden</p>
+                </div>
+
+                <div class="instruction-box">
+                    <h3>Anleitung:</h3>
+                    <p id="practiceInstruction"></p>
+                </div>
+            </div>
+
+            <div class="controls-card">
+                <div class="controls">
+                    <button class="btn-control" onclick="previousUebung()" id="prevBtn">
+                        <svg class="icon" viewBox="0 0 24 24"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></svg>
+                    </button>
+                    
+                    <button class="btn-control play" onclick="togglePlay()" id="playBtn">
+                        <svg class="icon" id="playIcon" viewBox="0 0 24 24" style="width: 2rem; height: 2rem; stroke: white;">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                    </button>
+                    
+                    <button class="btn-control" onclick="nextUebung()" id="nextBtn">
+                        <svg class="icon" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Complete View -->
+        <div id="completeView" class="view">
+            <div class="complete-container">
+                <div class="complete-card">
+                    <div class="emoji">🧘</div>
+                    <h2>Wunderbar!</h2>
+                    <p>Sie haben alle 4 Grundübungen des Autogenen Trainings abgeschlossen. Nehmen Sie sich einen Moment Zeit, um die tiefe Entspannung zu genießen.</p>
+                    <div class="button-grid">
+                        <button class="btn btn-primary" onclick="startPractice()">Erneut üben</button>
+                        <button class="btn btn-secondary" onclick="showView('homeView')">Zur Startseite</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings View -->
+        <div id="settingsView" class="view">
+            <div class="overview-header">
+                <h2>Einstellungen</h2>
+                <button class="btn btn-primary btn-small" onclick="showView('homeView')">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    Zurück
+                </button>
+            </div>
+
+            <div class="card">
+                <h3>Übungsdauer anpassen</h3>
+                <p style="margin-bottom: 1rem;">Wählen Sie die Dauer für jede Übung (in Sekunden):</p>
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                    <input type="range" id="durationSlider" min="15" max="120" value="40" step="5" 
+                           style="flex: 1; height: 0.5rem; cursor: pointer;" oninput="updateDurationDisplay()">
+                    <span id="durationDisplay" style="font-size: 1.2rem; font-weight: bold; color: #1e40af; min-width: 4rem;">40 Sek</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Farbschema wählen</h3>
+                <p style="margin-bottom: 1rem;">Wählen Sie Ihr bevorzugtes Farbschema:</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                    <button class="color-option" onclick="setColorScheme('standard')" data-scheme="standard">
+                        <div style="display: flex; gap: 0.25rem; margin-bottom: 0.5rem;">
+                            <div style="width: 25%; height: 2rem; background: #dbeafe; border-radius: 0.25rem;"></div>
+                            <div style="width: 25%; height: 2rem; background: #e9d5ff; border-radius: 0.25rem;"></div>
+                            <div style="width: 25%; height: 2rem; background: #fce7f3; border-radius: 0.25rem;"></div>
+                            <div style="width: 25%; height: 2rem; background: #e0e7ff; border-radius: 0.25rem;"></div>
+                        </div>
+                        <span>Standard</span>
+                    </button>
+                    <button class="color-option" onclick="setColorScheme('warm')" data-scheme="warm">
+                        <div style="display: flex; gap: 0.25rem; margin-bottom: 0.5rem;">
+                            <div style="width: 25%; height: 2rem; background: #fed7aa; border-radius: 0.25rem;"></div>
+                            <div style="width: 25%; height: 2rem; background: #fecaca; border-radius: 0.25rem;"></div>
+                            <div style="width: 25%; height: 2rem; background: #fef3c7; border-radius: 0.25rem;"></div>
+                            <div style="width: 25%; height: 2rem; background: #fce7f3; border-radius: 0.25rem;"></div>
+                        </div>
+                        <span>Warm</span>
+                    </button>
+                    <button class="color-option" onclick="setColorScheme('cool')" data-scheme="cool">
+                        <div style="display: flex; gap: 0.25rem; margin-bottom: 0.5rem;">
+                            <div style="width: 25%; height: 2rem; background: #cffafe; border-radius: 0.25rem;"></div>
+                            <div style="width: 25%; height: 2rem; background: #ddd6fe; border-radius: 0.25rem;"></div>
+                            <div style="width: 25%; height: 2rem; background: #bae6fd; border-radius: 0.25rem;"></div>
+                            <div style="width: 25%; height: 2rem; background: #ccfbf1; border-radius: 0.25rem;"></div>
+                        </div>
+                        <span>Kühl</span>
+                    </button>
+                    <button class="color-option" onclick="setColorScheme('earth')" data-scheme="earth">
+                        <div style="display: flex; gap: 0.25rem; margin-bottom: 0.5rem;">
+                            <div style="width: 25%; height: 2rem; background: #d1fae5; border-radius: 0.25rem;"></div>
+                            <div style="width: 25%; height: 2rem; background: #fef3c7; border-radius: 0.25rem;"></div>
+                            <div style="width: 25%; height: 2rem; background: #fed7aa; border-radius: 0.25rem;"></div>
+                            <div style="width: 25%; height: 2rem; background: #d1d5db; border-radius: 0.25rem;"></div>
+                        </div>
+                        <span>Erdtöne</span>
+                    </button>
+                    <button class="color-option" onclick="setColorScheme('midnight')" data-scheme="midnight" style="background: #0f172a; color: white;">
+                        <div style="display: flex; gap: 0.25rem; margin-bottom: 0.5rem;">
+                            <div style="width: 25%; height: 2rem; background: #1e293b; border-radius: 0.25rem;"></div>
+                            <div style="width: 25%; height: 2rem; background: #2e1065; border-radius: 0.25rem;"></div>
+                            <div style="width: 25%; height: 2rem; background: #1e1b4b; border-radius: 0.25rem;"></div>
+                            <div style="width: 25%; height: 2rem; background: #020617; border-radius: 0.25rem;"></div>
+                        </div>
+                        <span>Midnight</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Musik-Einstellungen</h3>
+                <p style="margin-bottom: 1rem;">Automatisch Musik beim Üben abspielen:</p>
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="checkbox" id="autoMusicCheckbox" onchange="toggleAutoMusic()" 
+                           style="width: 1.5rem; height: 1.5rem; cursor: pointer;">
+                    <span>Musik automatisch starten</span>
+                </label>
+            </div>
+            <div class="card">
+                <h3>Design-Modus</h3>
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="checkbox" id="darkModeCheckbox" onchange="toggleDarkMode()" 
+                           style="width: 1.5rem; height: 1.5rem; cursor: pointer;">
+                    <span>Dunkelmodus aktivieren</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen Button -->
+    <button class="fullscreen-btn" onclick="toggleFullscreen()" id="fullscreenBtn" title="Vollbild umschalten">
+        <svg class="icon" viewBox="0 0 24 24" style="stroke: white;">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+        </svg>
+    </button>
+
+    <audio id="bgMusic" loop>
+       <source src="AutogenesTraining.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const uebungen = [
+            {
+                name: "Ruhe",
+                affirmation: '"Ich bin ganz ruhig"',
+                anleitung: "Konzentrieren Sie sich auf ein Gefühl der Ruhe. Wiederholen Sie innerlich die Formel 'Ich bin ganz ruhig'. Lassen Sie alle Anspannung los und spüren Sie, wie sich Ruhe in Ihrem ganzen Körper ausbreitet. Diese Grundübung ist die Basis aller weiteren Übungen.",
+                wirkung: "Beruhigt das Nervensystem, reduziert Stress und Angst, fördert innere Gelassenheit und mentale Klarheit.",
+                farbe: "bg-blue"
+            },
+            {
+                name: "Schwere",
+                affirmation: '"Meine Arme und Beine sind ganz schwer"',
+                anleitung: "Stellen Sie sich vor, wie Ihre Arme und Beine schwer werden. Beginnen Sie mit dem rechten Arm, dann dem linken Arm, gefolgt von beiden Beinen. Spüren Sie, wie die Schwere durch Ihre Gliedmaßen fließt. Dies zeigt die Entspannung Ihrer Muskulatur an.",
+                wirkung: "Löst Muskelverspannungen, fördert körperliche Entspannung, reduziert Muskeltonus und verbessert die Durchblutung.",
+                farbe: "bg-purple"
+            },
+            {
+                name: "Wärme",
+                affirmation: '"Meine Arme und Beine sind angenehm warm"',
+                anleitung: "Konzentrieren Sie sich auf ein Gefühl von Wärme in Ihren Armen und Beinen. Stellen Sie sich vor, wie sich angenehme Wärme in Ihren Gliedmaßen ausbreitet. Dies zeigt eine verbesserte Durchblutung an. Die Wärme fließt sanft durch Ihren ganzen Körper.",
+                wirkung: "Verbessert die Durchblutung, erweitert die Blutgefäße, fördert Entspannung, reguliert die Körpertemperatur und stärkt das Immunsystem.",
+                farbe: "bg-pink"
+            },
+            {
+                name: "Atmung",
+                affirmation: '"Es atmet mich" oder "Meine Atmung ist ruhig und gleichmäßig"',
+                anleitung: "Beobachten Sie Ihre Atmung, ohne sie zu beeinflussen. Spüren Sie, wie der Atem ganz von selbst fließt. Sagen Sie sich: 'Es atmet mich'. Lassen Sie den Atem kommen und gehen, ohne Anstrengung. Ihre Atmung wird automatisch ruhiger und gleichmäßiger.",
+                wirkung: "Beruhigt die Atmung, reduziert Atemfrequenz, verbessert Sauerstoffversorgung, wirkt angstlösend und fördert innere Harmonie.",
+                farbe: "bg-indigo"
+            }
+        ];
+
+        let currentUebung = 0;
+        let isPlaying = false;
+        let timeLeft = 40;
+        let timerInterval = null;
+        let isMusicOn = false;
+
+        let exerciseDuration = 40;
+        let autoMusic = false;
+        let currentColorScheme = 'standard';
+        
+        const colorSchemes = {
+            standard: ['bg-blue', 'bg-purple', 'bg-pink', 'bg-indigo'],
+            warm: ['bg-pink', 'bg-purple', 'bg-blue', 'bg-indigo'],
+            cool: ['bg-indigo', 'bg-blue', 'bg-purple', 'bg-pink'],
+            earth: ['bg-green', 'bg-yellow', 'bg-orange', 'bg-gray'],
+            midnight: ['bg-dark-blue', 'bg-dark-purple', 'bg-dark-indigo', 'bg-dark-slate'] // Neu!
+        };
+
+
+        // Initialize overview
+        function initOverview() {
+            const grid = document.getElementById('uebungenGrid');
+            grid.innerHTML = '';
+            
+            uebungen.forEach((uebung, index) => {
+                const card = document.createElement('div');
+                const colorClass = colorSchemes[currentColorScheme][index % 4];
+                card.className = `uebung-card ${colorClass}`;
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="uebung-number">${index + 1}</div>
+                        <div style="flex: 1;">
+                            <h3>${uebung.name}</h3>
+                        </div>
+                    </div>
+                    <p class="affirmation">${uebung.affirmation}</p>
+                    <p class="instruction">${uebung.anleitung}</p>
+                    <div class="effect-box">
+                        <p><strong>Wirkung:</strong> ${uebung.wirkung}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Show view
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            
+            if (viewId === 'overviewView') {
+                initOverview();
+            }
+        }
+
+        // Start practice
+        function startPractice() {
+            currentUebung = 0;
+            timeLeft = exerciseDuration;
+            isPlaying = false;
+            updatePracticeView();
+            showView('practiceView');
+            
+            // Auto-start music if enabled
+            if (autoMusic && !isMusicOn) {
+                toggleMusic();
+            }
+        }
+
+        // Stop practice
+        function stopPractice() {
+            isPlaying = false;
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            // Stop music when stopping practice
+            if (isMusicOn) {
+                toggleMusic();
+            }
+        }
+
+        // Update practice view
+        function updatePracticeView() {
+            const uebung = uebungen[currentUebung];
+            const practiceMain = document.getElementById('practiceMain');
+            
+            // Remove all color classes
+            practiceMain.className = 'practice-main';
+            // Add current color from selected scheme
+            const colorClass = colorSchemes[currentColorScheme][currentUebung % 4];
+            practiceMain.classList.add(colorClass);
+            
+            document.getElementById('practiceNumber').textContent = currentUebung + 1;
+            document.getElementById('practiceName').textContent = uebung.name;
+            document.getElementById('practiceAffirmation').textContent = uebung.affirmation;
+            document.getElementById('practiceInstruction').textContent = uebung.anleitung;
+            
+            document.getElementById('currentNumber').textContent = currentUebung + 1;
+            
+            const progress = (currentUebung / uebungen.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressPercent').textContent = Math.round(progress) + '% abgeschlossen';
+            
+            // Update buttons
+            document.getElementById('prevBtn').disabled = currentUebung === 0;
+            document.getElementById('nextBtn').disabled = currentUebung === uebungen.length - 1;
+        }
+
+        // Toggle play/pause
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            const playIcon = document.getElementById('playIcon');
+            
+            if (isPlaying) {
+                playIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
+                startTimer();
+            } else {
+                playIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+                stopTimer();
+            }
+        }
+
+        // Start timer
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timerDisplay').textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    if (currentUebung < uebungen.length - 1) {
+                        currentUebung++;
+                        timeLeft = exerciseDuration;
+                        updatePracticeView();
+                    } else {
+                        stopTimer();
+                        isPlaying = false;
+                        showView('completeView');
+                    }
+                }
+            }, 1000);
+        }
+
+        // Stop timer
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        // Next uebung
+        function nextUebung() {
+            if (currentUebung < uebungen.length - 1) {
+                currentUebung++;
+                timeLeft = 40;
+                document.getElementById('timerDisplay').textContent = timeLeft;
+                updatePracticeView();
+            }
+        }
+
+        // Previous uebung
+        function previousUebung() {
+            if (currentUebung > 0) {
+                currentUebung--;
+                timeLeft = 40;
+                document.getElementById('timerDisplay').textContent = timeLeft;
+                updatePracticeView();
+            }
+        }
+
+        // Toggle music
+        function toggleMusic() {
+            const audio = document.getElementById('bgMusic');
+            const musicWaves = document.getElementById('musicWaves');
+            
+            isMusicOn = !isMusicOn;
+            
+            if (isMusicOn) {
+                audio.play().catch(e => console.log('Audio play failed:', e));
+                musicWaves.style.display = 'block';
+            } else {
+                audio.pause();
+                musicWaves.style.display = 'none';
+            }
+        }
+        // Fullscreen Modus umschalten
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+        // Dunkelmodus umschalten
+        function toggleDarkMode() {
+            const isDark = document.getElementById('darkModeCheckbox').checked;
+            if (isDark) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        }
+
+        // Farbschema setzen (*******************************************)
+        function setColorScheme(scheme) {
+            currentColorScheme = scheme;
+            
+            const backgrounds = {
+                standard: 'linear-gradient(135deg, #e0f2fe 0%, #ddd6fe 50%, #fce7f3 100%)',
+                warm: 'linear-gradient(135deg, #ffedd5 0%, #fee2e2 50%, #fef3c7 100%)',
+                cool: 'linear-gradient(135deg, #ecfeff 0%, #e0e7ff 50%, #ccfbf1 100%)',
+                earth: 'linear-gradient(135deg, #d1fae5 0%, #fef3c7 50%, #ffedd5 100%)',
+                midnight: 'linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e1b4b 100%)' // Dunkler Verlauf
+            };
+
+            // Hintergrund anwenden
+            document.body.style.background = backgrounds[scheme];
+            //document.body.style.color = scheme === 'midnight' ? '#f8fafc' : '';
+            
+            // Wenn Midnight gewählt wird, automatisch den Text auf hell schalten
+            if (scheme === 'midnight') {
+                document.body.style.color = '#f8fafc';
+            } else {
+                document.body.style.color = ''; // Zurück zum Standard
+            }
+
+            // Buttons markieren
+            document.querySelectorAll('.color-option').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-scheme') === scheme) btn.classList.add('active');
+            });
+
+            if (document.getElementById('practiceView').classList.contains('active')) {
+                updatePracticeView();
+            }
+        }
+
+        // Übungsdauer aktualisieren (wird vom Slider aufgerufen)
+        function updateDurationDisplay() {
+            const slider = document.getElementById('durationSlider');
+            exerciseDuration = parseInt(slider.value);
+            document.getElementById('durationDisplay').textContent = exerciseDuration + " Sek";
+            
+            // Wenn nicht gerade ein Timer läuft, Zeit im Display anpassen
+            if (!isPlaying) {
+                timeLeft = exerciseDuration;
+                document.getElementById('timerDisplay').textContent = timeLeft;
+            }
+        }
+        // Automatisches Abspielen der Musik umschalten
+        function toggleAutoMusic() {
+            autoMusic = document.getElementById('autoMusicCheckbox').checked;
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            initOverview();
+            updatePracticeView();
+        };
+                
+    </script>
+</body>
+</html>
