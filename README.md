@@ -1,31 +1,28 @@
-# zaminia
-Ganzheitliches Heilen mit Qigong Tai-chi-chuan Autogenes Training...
+# 🎨 Zaminias Atelier – Impressionen aus Paris
 
-Mit Zaminia
+Willkommen in der digitalen Galerie von **Zaminia**. Dieses Webprojekt ist eine Begleitung zum Buch über die 21-jährige Kunststudentin Zami, die in ihrer Pariser Dachwohnung zwischen Aquarellfarben und ihrer Katze Luna lebt.
 
-# 🧘 Autogenes Training – Übungsbegleiter
+Diese Webseite dient als Leinwand für ihre impressionistischen Werke und verbindet moderne Webtechnik mit künstlerischem Flair.
 
-Willkommen in meinem digitalen Entspannungsraum! Diese App hilft dabei, Ruhe im Alltag zu finden, inspiriert von der Zen-Philosophie und der Achtsamkeit.
+## ✨ Features
+* **Impressionistisches Design:** Ein Layout, das an schweres Aquarellpapier und Pariser Galerien erinnert.
+* **Interaktive Galerie:** Ein 1:1 quadratisches Ausstellungsfenster für Zaminias Kunstwerke.
+* **Künstlerische Typografie:** Verwendung von eleganten Serifenschriften und handschriftlichen Akzenten via Google Fonts.
+* **Responsives Layout:** Die Galerie passt sich sanft an verschiedene Bildschirmgrößen an.
 
-## 🌟 Über das Projekt
-Diese Web-App ist ein interaktiver Begleiter für das **Autogene Training**. Sie wurde entwickelt, um die Schwere-, Wärme- und Ruheübungen visuell und akustisch zu unterstützen. 
+## 🛠️ Installation & Struktur
 
-Die App ist Teil einer größeren Reise durch die Welt von **Zaminia**, einer jungen Künstlerin aus Paris, und wird begleitet von den Weisheiten des Zen-Meisters **Zenjio**.
+Um das Atelier lokal auf deinem Computer zu öffnen, ordne die Dateien bitte wie folgt an:
 
-## 🚀 Funktionen
-* **Interaktive Übungen:** Timer-gesteuerte Phasen für das autogene Training.
-* **Atmosphärisches Design:** Ein sanfter, impressionistischer Stil, der den Geist beruhigt.
-* **Audio-Unterstützung:** Hintergrundmusik zur tiefen Entspannung.
-* **Anpassbar:** Verschiedene Farbschemata für Tag und Nacht.
-
-## 🔭 Hintergrund & Philosophie
-Hinter diesem Projekt steht die **Wellenraumzeit-Theorie (WRZT)**. So wie das Licht sich durch den Raum bewegt, so bewegen sich unsere Gedanken durch die Zeit. Diese App soll helfen, die Wellen des Geistes zu glätten und in den Moment der Stille einzutauchen – ganz im Sinne von *Thich Nhat Hanh*.
-
-## 🛠 Installation & Nutzung
-Da es sich um eine reine HTML/JavaScript-App handelt, ist keine Installation nötig:
-1. Öffne einfach die `index.html` in deinem Browser.
-2. Wähle eine Übung aus.
-3. Atme tief ein... und aus.
-
----
-*Erstellt von Jup (Jo) – Inspiriert von Zaminia, der Kunst und der Astrophysik.*
+```text
+/Zaminia-Projekt
+│
+├── index.html          # Das Grundgerüst der Galerie
+├── style.css           # Die ästhetische Gestaltung & Typografie
+├── script.js           # Die Logik für den Bildwechsel
+├── zami.png            # Dein Willkommensbild von Zami
+├── favicon.png         # Das kleine Icon für den Browsertab
+└── /bilder             # Dein Ordner für die Kunstwerke
+    ├── kunst1.jpg
+    ├── kunst2.jpg
+    └── ...
