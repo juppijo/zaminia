@@ -7,7 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const bilderListe = [
         'bilder/kunst1.jpg',
         'bilder/kunst2.jpg',
-        'bilder/kunst3.jpg'
+        'bilder/kunst3.jpg',
+        'bilder/kunst4.jpg'
     ];
     
     let aktuellerIndex = 0;
