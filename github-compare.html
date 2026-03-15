@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub ↔ Local Repo Sync</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0c0f;
+  --surface: #111318;
+  --surface2: #161a21;
+  --border: #1e2329;
+  --border-bright: #2e3540;
+  --text: #c9d1d9;
+  --text-dim: #6e7681;
+  --text-bright: #f0f6fc;
+  --accent: #58a6ff;
+  --accent-dim: #1f3a5f;
+  --green: #3fb950;
+  --green-dim: #0d2119;
+  --orange: #d29922;
+  --orange-dim: #2d1f00;
+  --red: #f85149;
+  --red-dim: #2d0f0e;
+  --purple: #bc8cff;
+  --purple-dim: #1e1433;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background-image:
+    linear-gradient(rgba(88,166,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(88,166,255,.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events:none; z-index:0;
+}
+.container { max-width:1100px; margin:0 auto; padding:36px 24px; position:relative; z-index:1; }
+
+header { display:flex; align-items:center; gap:14px; margin-bottom:36px; }
+.logo {
+  width:40px; height:40px; background:var(--accent); border-radius:10px;
+  display:flex; align-items:center; justify-content:center; font-size:18px;
+  box-shadow:0 0 20px rgba(88,166,255,.3); flex-shrink:0;
+}
+h1 { font-family:'Syne',sans-serif; font-weight:800; font-size:1.7rem; color:var(--text-bright); letter-spacing:-.5px; }
+h1 span { color:var(--accent); }
+.subtitle { font-size:.68rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:.1em; margin-top:2px; }
+
+.panel {
+  background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  padding:24px; margin-bottom:20px;
+  display:grid; grid-template-columns:1fr 1fr; gap:16px;
+}
+.field { display:flex; flex-direction:column; gap:6px; }
+.field.full { grid-column:1/-1; }
+label { font-size:.67rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:.1em; }
+input[type=text], input[type=password] {
+  background:var(--bg); border:1px solid var(--border); border-radius:7px;
+  color:var(--text-bright); font-family:'JetBrains Mono',monospace; font-size:.83rem;
+  padding:9px 12px; outline:none; transition:border-color .2s; width:100%;
+}
+input:focus { border-color:var(--accent); }
+input::placeholder { color:var(--text-dim); opacity:.5; }
+.hint { font-size:.65rem; color:var(--text-dim); margin-top:2px; }
+.hint a { color:var(--accent); text-decoration:none; }
+
+.folder-box {
+  background:var(--bg); border:1px solid var(--border); border-radius:7px;
+  padding:9px 12px; font-size:.83rem; color:var(--text-dim);
+  display:flex; align-items:center; gap:8px; min-height:38px;
+  cursor:pointer; transition:border-color .2s;
+}
+.folder-box:hover { border-color:var(--border-bright); }
+.folder-box.ok { color:var(--text-bright); border-color:var(--green); }
+
+.btn-row { grid-column:1/-1; display:flex; gap:10px; flex-wrap:wrap; }
+button {
+  font-family:'JetBrains Mono',monospace; font-size:.78rem; font-weight:500;
+  border:none; border-radius:7px; padding:9px 18px; cursor:pointer;
+  transition:all .15s; display:flex; align-items:center; gap:7px;
+}
+.btn-primary { background:var(--accent); color:#000; }
+.btn-primary:hover { background:#79bbff; transform:translateY(-1px); }
+.btn-primary:disabled { opacity:.35; cursor:not-allowed; transform:none; }
+.btn-ghost { background:transparent; border:1px solid var(--border-bright); color:var(--text); }
+.btn-ghost:hover { background:var(--border); }
+
+.loading-bar { height:2px; background:var(--border); border-radius:2px; overflow:hidden; margin-bottom:20px; display:none; }
+.loading-bar.on { display:block; }
+.loading-bar::after {
+  content:''; display:block; height:100%; width:35%; background:var(--accent);
+  border-radius:2px; animation:slide 1s ease-in-out infinite;
+}
+@keyframes slide { 0%{transform:translateX(-150%)} 100%{transform:translateX(380%)} }
+
+.error-box {
+  background:var(--red-dim); border:1px solid rgba(248,81,73,.3); color:var(--red);
+  border-radius:8px; padding:11px 14px; font-size:.78rem; margin-bottom:16px; display:none;
+}
+
+.stats { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; opacity:0; transition:opacity .3s; }
+.stats.on { opacity:1; }
+.pill {
+  display:flex; align-items:center; gap:7px;
+  background:var(--surface); border:1px solid var(--border); border-radius:20px;
+  padding:6px 14px; font-size:.75rem;
+}
+.dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.d-green  { background:var(--green);  box-shadow:0 0 5px var(--green); }
+.d-orange { background:var(--orange); box-shadow:0 0 5px var(--orange); }
+.d-purple { background:var(--purple); box-shadow:0 0 5px var(--purple); }
+.d-dim    { background:var(--text-dim); }
+
+.toolbar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.ftab {
+  font-size:.68rem; padding:5px 12px; border-radius:5px;
+  background:transparent; border:1px solid var(--border); color:var(--text-dim);
+  cursor:pointer; transition:all .15s; text-transform:uppercase; letter-spacing:.06em;
+}
+.ftab:hover { border-color:var(--border-bright); color:var(--text); }
+.ftab.on { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
+.search-wrap { position:relative; flex:1; min-width:180px; }
+.search-wrap input { padding-left:32px; }
+.search-icon { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-dim); font-size:.8rem; pointer-events:none; }
+
+.cards { display:grid; gap:6px; }
+
+.card {
+  background:var(--surface); border:1px solid var(--border); border-radius:10px;
+  overflow:hidden; animation:fadeUp .2s ease both;
+}
+@keyframes fadeUp { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+.card.synced     { border-left:3px solid var(--green); }
+.card.gh-only    { border-left:3px solid var(--orange); }
+.card.local-only { border-left:3px solid var(--purple); }
+
+.card-head {
+  display:flex; align-items:flex-start; gap:12px; padding:12px 16px;
+}
+.card-head:hover { background:var(--surface2); }
+.card-icon { font-size:.9rem; margin-top:2px; flex-shrink:0; width:20px; text-align:center; }
+.card-body { flex:1; min-width:0; }
+.card-right { display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0; }
+.card-name { font-size:.88rem; color:var(--text-bright); font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.card-name a { color:inherit; text-decoration:none; }
+.card-name a:hover { color:var(--accent); }
+.card-meta { display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
+.mi { font-size:.65rem; color:var(--text-dim); }
+.badge {
+  font-size:.62rem; padding:3px 9px; border-radius:4px;
+  font-weight:500; white-space:nowrap; text-transform:uppercase; letter-spacing:.07em;
+}
+.b-green  { background:var(--green-dim);  color:var(--green);  border:1px solid rgba(63,185,80,.2); }
+.b-orange { background:var(--orange-dim); color:var(--orange); border:1px solid rgba(210,153,34,.2); }
+.b-purple { background:var(--purple-dim); color:var(--purple); border:1px solid rgba(188,140,255,.2); }
+
+.tree-btn {
+  background:var(--accent-dim); border:1px solid var(--accent); border-radius:5px;
+  color:var(--accent); font-size:.68rem; padding:4px 10px; cursor:pointer;
+  transition:all .15s; white-space:nowrap; font-family:'JetBrains Mono',monospace;
+  font-weight:500;
+}
+.tree-btn:hover { background:var(--accent); color:#000; }
+.tree-btn.open  { background:var(--accent); color:#000; }
+
+.tree-panel {
+  border-top:1px solid var(--border); background:var(--bg);
+  padding:14px 16px; display:none;
+  max-height:360px; overflow-y:auto;
+}
+.tree-panel.open { display:block; }
+.tree-panel::-webkit-scrollbar { width:4px; }
+.tree-panel::-webkit-scrollbar-thumb { background:var(--border-bright); border-radius:2px; }
+
+.tree { font-size:.75rem; }
+.t-row {
+  display:flex; align-items:center; gap:5px;
+  padding:2px 0; cursor:default; border-radius:4px;
+  transition:background .1s;
+}
+.t-row.clickable { cursor:pointer; }
+.t-row.clickable:hover { background:var(--surface2); }
+.t-chevron { width:12px; font-size:.55rem; color:var(--text-dim); flex-shrink:0; text-align:center; }
+.t-icon { flex-shrink:0; }
+.t-label { color:var(--text); }
+.t-label.dir { color:var(--accent); font-weight:500; }
+.t-label.special { color:var(--text-dim); font-style:italic; }
+.t-count { color:var(--text-dim); font-size:.62rem; margin-left:3px; }
+.t-children { display:none; }
+.t-children.open { display:block; }
+.t-loading { color:var(--text-dim); font-size:.72rem; padding:3px 0; }
+
+.placeholder {
+  text-align:center; padding:50px 20px; color:var(--text-dim); font-size:.8rem;
+  border:1px dashed var(--border); border-radius:12px; line-height:2;
+}
+.placeholder .big { font-size:2.2rem; margin-bottom:10px; }
+
+@media(max-width:600px){
+  .panel { grid-template-columns:1fr; }
+  h1 { font-size:1.3rem; }
+  .card-head { grid-template-columns:18px 1fr auto; }
+  .card-head .badge { display:none; }
+}
+
+/* ── Diff view ──────────────────────────────────────────── */
+.diff-toolbar {
+  display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+  padding:10px 14px; border-bottom:1px solid var(--border);
+  background:var(--surface);
+}
+.diff-legend { display:flex; gap:12px; flex-wrap:wrap; margin-left:auto; }
+.dl { display:flex; align-items:center; gap:5px; font-size:.65rem; color:var(--text-dim); }
+.dl-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.diff-filter-btn {
+  font-size:.67rem; padding:3px 10px; border-radius:4px;
+  background:transparent; border:1px solid var(--border); color:var(--text-dim);
+  cursor:pointer; transition:all .12s; font-family:'JetBrains Mono',monospace;
+}
+.diff-filter-btn:hover { border-color:var(--border-bright); color:var(--text); }
+.diff-filter-btn.on { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
+
+.diff-tree { font-size:.75rem; padding:10px 14px; }
+.d-row {
+  display:flex; align-items:center; gap:6px;
+  padding:2px 2px; border-radius:4px;
+  border-left:2px solid transparent;
+}
+.d-row.d-match  { opacity:.55; }
+.d-row.d-match:hover { opacity:1; background:var(--surface2); }
+.d-row.d-missing-local  { background:rgba(248,81,73,.07);  border-left-color:var(--red); }
+.d-row.d-missing-gh     { background:rgba(188,140,255,.07); border-left-color:var(--purple); }
+.d-row.d-missing-local:hover  { background:rgba(248,81,73,.13); }
+.d-row.d-missing-gh:hover     { background:rgba(188,140,255,.13); }
+.d-status { width:14px; font-size:.65rem; text-align:center; flex-shrink:0; }
+.d-icon   { flex-shrink:0; }
+.d-path   { color:var(--text); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.d-path.d-missing-local-text { color:var(--red); }
+.d-path.d-missing-gh-text    { color:var(--purple); }
+.d-tag {
+  font-size:.58rem; padding:1px 6px; border-radius:3px;
+  white-space:nowrap; font-weight:600; letter-spacing:.05em; flex-shrink:0;
+}
+.d-tag-missing-local { background:var(--red-dim);    color:var(--red);    border:1px solid rgba(248,81,73,.25); }
+.d-tag-missing-gh    { background:var(--purple-dim); color:var(--purple); border:1px solid rgba(188,140,255,.25); }
+.diff-summary {
+  padding:8px 14px; font-size:.72rem; color:var(--text-dim);
+  border-bottom:1px solid var(--border); display:flex; gap:16px; flex-wrap:wrap;
+}
+.ds-num { font-weight:700; }
+.ds-red    { color:var(--red); }
+.ds-purple { color:var(--purple); }
+.ds-green  { color:var(--green); }
+.diff-btn {
+  background:var(--surface2); border:1px solid var(--border-bright); border-radius:5px;
+  color:var(--text); font-size:.68rem; padding:4px 10px; cursor:pointer;
+  transition:all .15s; white-space:nowrap; font-family:'JetBrains Mono',monospace;
+  font-weight:500;
+}
+.diff-btn:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-dim); }
+.diff-btn.on    { border-color:var(--accent); color:var(--accent); background:var(--accent-dim); }
+
+/* ── Sync ───────────────────────────────────────────────── */
+.sync-btn {
+  background: var(--green-dim); border: 1px solid var(--green); border-radius: 5px;
+  color: var(--green); font-size: .68rem; padding: 4px 12px; cursor: pointer;
+  transition: all .15s; white-space: nowrap; font-family: 'JetBrains Mono', monospace;
+  font-weight: 600; display: flex; align-items: center; gap: 6px;
+}
+.sync-btn:hover   { background: var(--green); color: #000; }
+.sync-btn:disabled{ opacity: .4; cursor: not-allowed; }
+.sync-progress {
+  padding: 12px 14px; background: var(--surface); border-top: 1px solid var(--border);
+}
+.sync-bar-wrap {
+  height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin: 8px 0;
+}
+.sync-bar-fill {
+  height: 100%; background: var(--green); border-radius: 3px;
+  transition: width .3s; width: 0%;
+}
+.sync-log {
+  max-height: 160px; overflow-y: auto; font-size: .7rem; line-height: 1.8;
+  margin-top: 6px;
+}
+.sync-log::-webkit-scrollbar { width: 3px; }
+.sync-log::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+.slog-ok   { color: var(--green); }
+.slog-err  { color: var(--red); }
+.slog-info { color: var(--text-dim); }
+.slog-warn { color: var(--orange); }
+
+.fs-btn {
+  background: transparent; border: 1px solid var(--border-bright); border-radius: 8px;
+  color: var(--text-dim); font-size: 1.2rem; width: 38px; height: 38px;
+  cursor: pointer; transition: all .15s; display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0; font-family: monospace;
+}
+.fs-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="logo">⚡</div>
+    <div style="flex:1">
+      <h1>GitHub <span>↔</span> Local</h1>
+      <div class="subtitle">Repository Sync-Checker</div>
+    </div>
+    <button class="fs-btn" id="fsBtn" onclick="toggleFullscreen()" title="Vollbild">⛶</button>
+  </header>
+
+  <div class="panel">
+    <div class="field">
+      <label>GitHub Benutzername</label>
+      <input type="text" id="username" placeholder="z.B. octocat" oninput="checkReady()">
+    </div>
+    <div class="field">
+      <label>Personal Access Token <span style="color:var(--text-dim)">(optional)</span></label>
+      <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxx">
+      <div class="hint">Für private Repos. <a href="https://github.com/settings/tokens" target="_blank">Token erstellen →</a></div>
+    </div>
+    <div class="field full">
+      <label>Lokaler Ordner</label>
+      <div class="folder-box" id="folderBox" onclick="pickFolder()">
+        <span>📁</span><span id="folderName">Klicken um Ordner zu wählen…</span>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="pickFolder()">📂 Ordner wählen</button>
+      <button class="btn-primary" id="btnRun" onclick="run()" disabled>🔍 Vergleichen</button>
+    </div>
+  </div>
+
+  <div class="loading-bar" id="loadBar"></div>
+  <div class="error-box"   id="errBox"></div>
+
+  <div class="stats" id="stats">
+    <div class="pill"><div class="dot d-green"></div><span id="sSync">0 Synced</span></div>
+    <div class="pill"><div class="dot d-orange"></div><span id="sGh">0 Nur GitHub</span></div>
+    <div class="pill"><div class="dot d-purple"></div><span id="sLoc">0 Nur Lokal</span></div>
+    <div class="pill"><div class="dot d-dim"></div><span id="sAll">0 Gesamt</span></div>
+  </div>
+
+  <div id="main" style="display:none">
+    <div class="toolbar">
+      <button class="ftab on" onclick="setFilter('all',this)">Alle</button>
+      <button class="ftab" onclick="setFilter('synced',this)">✓ Synced</button>
+      <button class="ftab" onclick="setFilter('gh-only',this)">↓ Nur GitHub</button>
+      <button class="ftab" onclick="setFilter('local-only',this)">📁 Nur Lokal</button>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search" placeholder="Suchen…" oninput="render()">
+      </div>
+    </div>
+    <div class="cards" id="cards"></div>
+  </div>
+
+  <div class="placeholder" id="ph">
+    <div class="big">🔄</div>
+    GitHub-Benutzernamen eingeben,<br>
+    lokalen Projektordner wählen<br>
+    und auf <strong>Vergleichen</strong> klicken.
+  </div>
+
+</div>
+<script>
+/* ── State ─────────────────────────────────────────────── */
+let rootHandle  = null;
+let results     = [];
+let currentFilter = 'all';
+let localRepos  = new Map(); // name → { handle, path }
+
+/* ── Folder picker ─────────────────────────────────────── */
+async function pickFolder() {
+  try {
+    rootHandle = await window.showDirectoryPicker({ mode: 'read' });
+    document.getElementById('folderName').textContent = rootHandle.name;
+    document.getElementById('folderBox').classList.add('ok');
+    checkReady();
+  } catch(e) {
+    if (e.name !== 'AbortError') showErr('Ordner-Fehler: ' + e.message);
+  }
+}
+
+function checkReady() {
+  const ok = document.getElementById('username').value.trim() && rootHandle;
+  document.getElementById('btnRun').disabled = !ok;
+}
+
+/* ── Strip ZIP suffixes ─────────────────────────────────── */
+// GitHub ZIPs extract as "reponame-main", "reponame-master", etc.
+function normalizeRepoName(name) {
+  return name.replace(/-(main|master|dev|develop|development|trunk|latest|release)$/i, '');
+}
+
+/* ── Recursive local scanner ───────────────────────────── */
+// Returns Map<normalizedName, { handle, path, rawName, isZip }>
+async function scanLocal(dirHandle, relPath, depth) {
+  const repos = new Map();
+  if (depth > 4) return repos;
+
+  let hasGit = false;
+  const subdirs = [];
+  const files   = [];
+
+  try {
+    for await (const [name, h] of dirHandle.entries()) {
+      if (h.kind === 'directory') {
+        if (name === '.git') hasGit = true;
+        else subdirs.push({ name, h });
+      } else {
+        files.push(name);
+      }
+    }
+  } catch { return repos; }
+
+  const myPath = relPath ? relPath + '/' + dirHandle.name : dirHandle.name;
+
+  if (hasGit) {
+    // git clone – exact folder name
+    repos.set(dirHandle.name, { handle: dirHandle, path: myPath, rawName: dirHandle.name, isZip: false });
+    return repos;
+  }
+
+  // Detect ZIP-extracted folder: has project files but no .git
+  const projectFiles = new Set(['package.json','README.md','readme.md','index.html',
+    'index.js','main.py','pom.xml','Cargo.toml','go.mod','composer.json',
+    'requirements.txt','Makefile','CMakeLists.txt']);
+  const hasProjectFile = files.some(f => projectFiles.has(f));
+
+  if (hasProjectFile && depth > 0) {
+    const normalized = normalizeRepoName(dirHandle.name);
+    repos.set(normalized, { handle: dirHandle, path: myPath, rawName: dirHandle.name, isZip: dirHandle.name !== normalized });
+    return repos;
+  }
+
+  // Not a repo – recurse into subdirs
+  const skip = new Set(['node_modules','__pycache__','.DS_Store','.cache','dist','build','.next','.nuxt','vendor','.venv','venv']);
+  for (const { name, h } of subdirs) {
+    if (name.startsWith('.') || skip.has(name)) continue;
+    const sub = await scanLocal(h, myPath, depth + 1);
+    for (const [k, v] of sub) repos.set(k, v);
+  }
+  return repos;
+}
+
+/* ── GitHub API ────────────────────────────────────────── */
+async function fetchGH(user, token) {
+  const hdrs = { Accept: 'application/vnd.github.v3+json' };
+  if (token) hdrs.Authorization = 'token ' + token;
+  const all = [];
+  let page = 1;
+  while (true) {
+    const r = await fetch(
+      `https://api.github.com/users/${user}/repos?per_page=100&page=${page}&sort=updated`,
+      { headers: hdrs }
+    );
+    if (!r.ok) { const j=await r.json().catch(()=>({})); throw new Error(j.message||'GitHub Fehler '+r.status); }
+    const d = await r.json();
+    all.push(...d);
+    if (d.length < 100) break;
+    page++;
+  }
+  return all;
+}
+
+/* ── Main compare ──────────────────────────────────────── */
+async function run() {
+  const user  = document.getElementById('username').value.trim();
+  const token = document.getElementById('token').value.trim();
+
+  hideErr(); setLoad(true);
+  document.getElementById('main').style.display = 'none';
+  document.getElementById('ph').style.display   = 'none';
+
+  try {
+    const [ghRepos, lMap] = await Promise.all([
+      fetchGH(user, token),
+      scanLocal(rootHandle, '', 0)
+    ]);
+    localRepos = lMap;
+
+    const ghSet = new Set(ghRepos.map(r => r.name));
+    results = [];
+
+    for (const r of ghRepos) {
+      const loc = localRepos.get(r.name) || null;
+      results.push({
+        name: r.name,
+        status: loc ? 'synced' : 'gh-only',
+        localHandle: loc?.handle  || null,
+        localPath:   loc?.path    || null,
+        rawName:     loc?.rawName || null,
+        isZip:       loc?.isZip   || false,
+        desc:    r.description || '',
+        lang:    r.language    || '',
+        stars:   r.stargazers_count,
+        updated: r.updated_at,
+        url:     r.html_url,
+        priv:    r.private,
+        fork:    r.fork,
+      });
+    }
+
+    for (const [name, { handle, path, rawName, isZip }] of localRepos) {
+      if (!ghSet.has(name)) {
+        results.push({
+          name, status:'local-only',
+          localHandle: handle, localPath: path,
+          rawName, isZip,
+          desc:'', lang:'', stars:null, updated:null,
+          url:null, priv:false, fork:false,
+        });
+      }
+    }
+
+    const ord = { synced:0,'gh-only':1,'local-only':2 };
+    results.sort((a,b) => ord[a.status]-ord[b.status] || a.name.localeCompare(b.name));
+
+    updateStats(); setLoad(false);
+    document.getElementById('main').style.display = 'block';
+    document.getElementById('search').value = '';
+    setFilter('all', document.querySelector('.ftab'));
+    render();
+
+  } catch(e) {
+    setLoad(false);
+    showErr('Fehler: ' + e.message);
+    document.getElementById('ph').style.display = 'block';
+  }
+}
+
+/* ── Stats ─────────────────────────────────────────────── */
+function updateStats() {
+  const s = results.filter(r=>r.status==='synced').length;
+  const g = results.filter(r=>r.status==='gh-only').length;
+  const l = results.filter(r=>r.status==='local-only').length;
+  document.getElementById('sSync').textContent = s+' Synced';
+  document.getElementById('sGh').textContent   = g+' Nur GitHub';
+  document.getElementById('sLoc').textContent  = l+' Nur Lokal';
+  document.getElementById('sAll').textContent  = results.length+' Gesamt';
+  document.getElementById('stats').classList.add('on');
+}
+
+/* ── Filter / render ───────────────────────────────────── */
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  render();
+}
+
+function render() {
+  const q    = document.getElementById('search').value.toLowerCase();
+  const grid = document.getElementById('cards');
+
+  let list = results;
+  if (currentFilter !== 'all') list = list.filter(r=>r.status===currentFilter);
+  if (q) list = list.filter(r=>r.name.toLowerCase().includes(q)||r.desc.toLowerCase().includes(q));
+
+  if (!list.length) {
+    grid.innerHTML = `<div class="placeholder"><div class="big">🔎</div>Keine Treffer.</div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map((r,i) => {
+    const icon  = r.status==='synced'?'✓':r.status==='gh-only'?'↓':'📁';
+    const badge = r.status==='synced'
+      ? `<span class="badge b-green">Synced</span>`
+      : r.status==='gh-only'
+      ? `<span class="badge b-orange">Nur GitHub</span>`
+      : `<span class="badge b-purple">Nur Lokal</span>`;
+
+    const nameHtml = r.url
+      ? `<a href="${r.url}" target="_blank" onclick="event.stopPropagation()">${r.name}</a>`
+      : r.name;
+
+    const meta = [
+      r.lang    ? `<span class="mi">◆ ${r.lang}</span>` : '',
+      r.stars!=null ? `<span class="mi">★ ${r.stars}</span>` : '',
+      r.updated ? `<span class="mi">🕐 ${new Date(r.updated).toLocaleDateString('de-DE')}</span>` : '',
+      r.priv    ? `<span class="mi">🔒 Privat</span>` : '',
+      r.fork    ? `<span class="mi">🍴 Fork</span>` : '',
+      r.isZip ? `<span class="mi" style="color:var(--orange)">📦 ZIP (${r.rawName})</span>` : '',
+      r.localPath && r.localPath !== r.name && !r.isZip
+        ? `<span class="mi" title="${r.localPath}">📂 …/${r.name}</span>` : '',
+    ].filter(Boolean).join('');
+
+    const treeBtn = r.localHandle
+      ? `<button class="tree-btn" id="tbtn-${i}" onclick="toggleTree(event,${i},'${r.name}')">📂 Dateien</button>`
+      : '';
+    const diffBtn = (r.localHandle && r.status === 'synced')
+      ? `<button class="diff-btn" id="dbtn-${i}" onclick="toggleDiff(event,${i},'${r.name}')">🔍 Diff</button>`
+      : '';
+
+    return `
+      <div class="card ${r.status}" style="animation-delay:${Math.min(i*.025,.4)}s">
+        <div class="card-head">
+          <div class="card-icon">${icon}</div>
+          <div class="card-body">
+            <div class="card-name">${nameHtml}</div>
+            <div class="card-meta">${meta}</div>
+          </div>
+          <div class="card-right">
+            ${badge}
+            <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;">
+              ${treeBtn}
+              ${diffBtn}
+            </div>
+          </div>
+        </div>
+        <div class="tree-panel" id="tree-${i}"></div>
+      </div>`;
+  }).join('');
+}
+
+/* ── Tree toggle ───────────────────────────────────────── */
+async function toggleTree(e, idx, repoName) {
+  e.stopPropagation();
+  const panel = document.getElementById('tree-'+idx);
+  const btn   = document.getElementById('tbtn-'+idx);
+
+  if (panel.classList.contains('open')) {
+    panel.classList.remove('open');
+    btn.classList.remove('open');
+    btn.textContent = '📂 Dateien';
+    return;
+  }
+
+  panel.classList.add('open');
+  btn.classList.add('open');
+  btn.textContent = '📂 Dateien ▼';
+
+  if (panel.dataset.loaded) return;
+  panel.dataset.loaded = '1';
+  panel.dataset.mode   = 'tree';
+
+  const repo = results.find(r=>r.name===repoName);
+  if (!repo?.localHandle) {
+    panel.innerHTML = '<div class="t-loading" style="padding:12px">Kein lokaler Zugriff.</div>';
+    return;
+  }
+
+  panel.innerHTML = '<div class="t-loading" style="padding:12px">Lade Verzeichnis…</div>';
+  const wrap = document.createElement('div');
+  wrap.className = 'tree';
+  await buildTree(wrap, repo.localHandle, 0);
+  panel.innerHTML = '';
+  panel.appendChild(wrap);
+}
+
+/* ── Diff toggle ────────────────────────────────────────── */
+async function toggleDiff(e, idx, repoName) {
+  e.stopPropagation();
+  const panel  = document.getElementById('tree-'+idx);
+  const btn    = document.getElementById('dbtn-'+idx);
+  const treeBtn = document.getElementById('tbtn-'+idx);
+
+  // If diff already open → close
+  if (panel.classList.contains('open') && panel.dataset.mode === 'diff') {
+    panel.classList.remove('open');
+    btn.classList.remove('on');
+    btn.textContent = '🔍 Diff';
+    return;
+  }
+
+  // Close tree view if open
+  if (treeBtn) { treeBtn.classList.remove('open'); treeBtn.textContent = '📂 Dateien'; }
+
+  panel.classList.add('open');
+  btn.classList.add('on');
+  btn.textContent = '🔍 Diff ▼';
+  panel.dataset.mode = 'diff';
+  panel.dataset.loaded = '';
+
+  const repo = results.find(r=>r.name===repoName);
+  const user = document.getElementById('username').value.trim();
+  const token = document.getElementById('token').value.trim();
+
+  panel.innerHTML = '<div class="t-loading" style="padding:12px">🔄 GitHub Dateibaum wird geladen…</div>';
+
+  try {
+    // Fetch GitHub tree
+    const hdrs = { Accept: 'application/vnd.github.v3+json' };
+    if (token) hdrs.Authorization = 'token ' + token;
+
+    // Get default branch first
+    const repoRes = await fetch(`https://api.github.com/repos/${user}/${repo.name}`, { headers: hdrs });
+    const repoData = await repoRes.json();
+    const branch = repoData.default_branch || 'main';
+
+    const treeRes = await fetch(
+      `https://api.github.com/repos/${user}/${repo.name}/git/trees/${branch}?recursive=1`,
+      { headers: hdrs }
+    );
+    const treeData = await treeRes.json();
+    const ghFiles = new Set(
+      (treeData.tree || [])
+        .filter(n => n.type === 'blob')
+        .map(n => n.path)
+    );
+    const ghDirs = new Set(
+      (treeData.tree || [])
+        .filter(n => n.type === 'tree')
+        .map(n => n.path)
+    );
+
+    panel.innerHTML = '<div class="t-loading" style="padding:12px">📁 Lokale Dateien werden gelesen…</div>';
+
+    // Collect local files
+    const localFiles = new Set();
+    await collectLocalFiles(repo.localHandle, '', localFiles);
+
+    // Compute diff
+    const allPaths = new Set([...ghFiles, ...localFiles]);
+    const diffItems = [];
+    for (const p of [...allPaths].sort()) {
+      const inGH    = ghFiles.has(p);
+      const inLocal = localFiles.has(p);
+      let status;
+      if (inGH && inLocal)   status = 'match';
+      else if (inGH)         status = 'missing-local';
+      else                   status = 'missing-gh';
+      diffItems.push({ path: p, status });
+    }
+
+    const nMissingLocal = diffItems.filter(d=>d.status==='missing-local').length;
+    const nMissingGH    = diffItems.filter(d=>d.status==='missing-gh').length;
+    const nMatch        = diffItems.filter(d=>d.status==='match').length;
+
+    // Store context for sync
+    panel._syncCtx = {
+      user, token,
+      repoName: repo.name,
+      branch,
+      localHandle: repo.localHandle,
+    };
+    renderDiff(panel, diffItems, nMatch, nMissingLocal, nMissingGH, idx);
+
+  } catch(err) {
+    panel.innerHTML = `<div style="padding:12px;color:var(--red);font-size:.78rem">Fehler: ${err.message}</div>`;
+  }
+}
+
+/* ── Collect local files recursively ────────────────────── */
+async function collectLocalFiles(dirHandle, prefix, result, depth=0) {
+  if (depth > 6) return;
+  const skip = new Set(['node_modules','.git','__pycache__','dist','build','.next','.nuxt','vendor','.venv','venv','.DS_Store']);
+  try {
+    for await (const [name, handle] of dirHandle.entries()) {
+      if (skip.has(name) || name.startsWith('.')) continue;
+      const path = prefix ? prefix + '/' + name : name;
+      if (handle.kind === 'file') {
+        result.add(path);
+      } else {
+        await collectLocalFiles(handle, path, result, depth+1);
+      }
+    }
+  } catch {}
+}
+
+/* ── Render diff panel ──────────────────────────────────── */
+function renderDiff(panel, items, nMatch, nMissingLocal, nMissingGH, idx) {
+  let activeFilter = 'issues';
+
+  function draw() {
+    const visible = activeFilter === 'all'
+      ? items
+      : activeFilter === 'issues'
+      ? items.filter(d=>d.status!=='match')
+      : items.filter(d=>d.status===activeFilter);
+
+    const rows = visible.map(d => {
+      const fname = d.path.split('/').pop();
+      const statusIcon = d.status==='match' ? '✓' : d.status==='missing-local' ? '✗' : '+';
+      const pathClass  = d.status==='missing-local' ? 'd-missing-local-text'
+        : d.status==='missing-gh' ? 'd-missing-gh-text' : '';
+      const tag = d.status==='missing-local'
+        ? `<span class="d-tag d-tag-missing-local">Fehlt lokal</span>`
+        : d.status==='missing-gh'
+        ? `<span class="d-tag d-tag-missing-gh">Nur lokal</span>`
+        : '';
+      return `
+        <div class="d-row d-${d.status}" id="drow-${idx}-${d.path.replace(/[^a-z0-9]/gi,'_')}">
+          <span class="d-status">${statusIcon}</span>
+          <span class="d-icon">${fileIcon(fname)}</span>
+          <span class="d-path ${pathClass}" title="${d.path}">${d.path}</span>
+          ${tag}
+        </div>`;
+    }).join('');
+
+    const hasMissing = nMissingLocal > 0;
+    const syncBtn = panel._syncCtx
+      ? `<button class="sync-btn" id="syncbtn-${idx}" onclick="startSync(event,${idx})" ${!hasMissing?'disabled':''}>
+           ⬇ ${nMissingLocal} Datei${nMissingLocal===1?'':'en'} synchronisieren
+         </button>`
+      : '';
+
+    panel.innerHTML = `
+      <div class="diff-summary">
+        <span><span class="ds-num ds-red">${nMissingLocal}</span> fehlen lokal</span>
+        <span><span class="ds-num ds-purple">${nMissingGH}</span> nur lokal</span>
+        <span><span class="ds-num ds-green">${nMatch}</span> identisch</span>
+      </div>
+      <div class="diff-toolbar">
+        <button class="diff-filter-btn ${activeFilter==='issues'?'on':''}" onclick="setDiffFilter(event,'issues',${idx})">⚠ Nur Abweichungen</button>
+        <button class="diff-filter-btn ${activeFilter==='missing-local'?'on':''}" onclick="setDiffFilter(event,'missing-local',${idx})">✗ Fehlt lokal</button>
+        <button class="diff-filter-btn ${activeFilter==='missing-gh'?'on':''}" onclick="setDiffFilter(event,'missing-gh',${idx})">+ Nur lokal</button>
+        <button class="diff-filter-btn ${activeFilter==='all'?'on':''}" onclick="setDiffFilter(event,'all',${idx})">Alle Dateien</button>
+        <div style="flex:1"></div>
+        ${syncBtn}
+      </div>
+      <div class="diff-tree" id="diff-rows-${idx}">${rows || '<div style="padding:8px 0;color:var(--green)">✓ Alle Dateien stimmen überein!</div>'}</div>
+      <div class="sync-progress" id="sync-progress-${idx}" style="display:none"></div>
+    `;
+
+    panel._diffItems  = items;
+    panel._diffFilter = activeFilter;
+    panel._diffNums   = { nMatch, nMissingLocal, nMissingGH };
+  }
+
+  panel._setFilter = (f) => { activeFilter = f; draw(); };
+  draw();
+}
+
+/* called from inline onclick */
+function setDiffFilter(e, f, idx) {
+  e.stopPropagation();
+  const panel = document.getElementById('tree-'+idx);
+  if (panel._setFilter) panel._setFilter(f);
+}
+
+/* ── Sync: write file into local folder ────────────────── */
+async function writeLocalFile(dirHandle, filePath, arrayBuffer) {
+  const parts = filePath.split('/');
+  let current = dirHandle;
+  // Create subdirectories
+  for (let i = 0; i < parts.length - 1; i++) {
+    current = await current.getDirectoryHandle(parts[i], { create: true });
+  }
+  const fileName = parts[parts.length - 1];
+  const fileHandle = await current.getFileHandle(fileName, { create: true });
+  const writable = await fileHandle.createWritable();
+  await writable.write(arrayBuffer);
+  await writable.close();
+}
+
+async function startSync(e, idx) {
+  e.stopPropagation();
+  const panel = document.getElementById('tree-' + idx);
+  const ctx   = panel._syncCtx;
+  if (!ctx) return;
+
+  // Request write permission
+  const perm = await ctx.localHandle.requestPermission({ mode: 'readwrite' });
+  if (perm !== 'granted') {
+    alert('Schreibzugriff verweigert. Bitte erlaube den Zugriff um zu synchronisieren.');
+    return;
+  }
+
+  const btn      = document.getElementById('syncbtn-' + idx);
+  const progress = document.getElementById('sync-progress-' + idx);
+  btn.disabled   = true;
+  btn.textContent = '⏳ Synchronisiere…';
+  progress.style.display = 'block';
+
+  const missingFiles = (panel._diffItems || []).filter(d => d.status === 'missing-local');
+  const total  = missingFiles.length;
+  let done     = 0, errors = 0;
+
+  const hdrs = { Accept: 'application/vnd.github.v3+json' };
+  if (ctx.token) hdrs.Authorization = 'token ' + ctx.token;
+
+  function log(msg, cls='slog-info') {
+    const logEl = progress.querySelector('.sync-log');
+    if (logEl) {
+      logEl.innerHTML += `<div class="${cls}">${msg}</div>`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+  }
+
+  function setBar(pct) {
+    const fill = progress.querySelector('.sync-bar-fill');
+    if (fill) fill.style.width = pct + '%';
+  }
+
+  progress.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <span style="font-size:.72rem;color:var(--text-dim)">Synchronisiere <strong style="color:var(--text-bright)">${total}</strong> Dateien…</span>
+      <span style="font-size:.7rem;color:var(--text-dim)" id="sync-counter-${idx}">0 / ${total}</span>
+    </div>
+    <div class="sync-bar-wrap"><div class="sync-bar-fill"></div></div>
+    <div class="sync-log"></div>
+  `;
+
+  log(`⬇ Starte Sync von <strong>${ctx.repoName}</strong> (Branch: ${ctx.branch})`, 'slog-info');
+
+  for (const item of missingFiles) {
+    const rawUrl = `https://raw.githubusercontent.com/${ctx.user}/${ctx.repoName}/${ctx.branch}/${item.path}`;
+    try {
+      const res = await fetch(rawUrl, { headers: hdrs });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const buf = await res.arrayBuffer();
+      await writeLocalFile(ctx.localHandle, item.path, buf);
+      done++;
+      log(`✓ ${item.path}`, 'slog-ok');
+    } catch(err) {
+      errors++;
+      log(`✗ ${item.path} — ${err.message}`, 'slog-err');
+    }
+
+    const pct = Math.round((done + errors) / total * 100);
+    setBar(pct);
+    const ctr = document.getElementById('sync-counter-' + idx);
+    if (ctr) ctr.textContent = `${done + errors} / ${total}`;
+  }
+
+  // Final status
+  if (errors === 0) {
+    log(`🎉 Fertig! ${done} Datei${done===1?'':'en'} erfolgreich synchronisiert.`, 'slog-ok');
+    btn.textContent = '✓ Synchronisiert';
+    btn.style.background = 'var(--green)';
+    btn.style.color = '#000';
+  } else {
+    log(`⚠ Abgeschlossen: ${done} ok, ${errors} Fehler.`, 'slog-warn');
+    btn.disabled = false;
+    btn.textContent = '⬇ Erneut versuchen';
+  }
+
+  // Update diff items
+  if (panel._diffItems) {
+    panel._diffItems.forEach(d => {
+      if (d.status === 'missing-local') d.status = 'match';
+    });
+    panel._diffNums.nMatch        += done;
+    panel._diffNums.nMissingLocal -= done;
+  }
+}
+
+/* ── Build file tree ───────────────────────────────────── */
+async function buildTree(container, dirHandle, depth) {
+  const entries = [];
+  try {
+    for await (const [name, handle] of dirHandle.entries()) {
+      entries.push({ name, handle, isDir: handle.kind==='directory' });
+    }
+  } catch { return; }
+
+  entries.sort((a,b)=>{
+    if (a.isDir!==b.isDir) return a.isDir?-1:1;
+    return a.name.localeCompare(b.name);
+  });
+
+  for (const { name, handle, isDir } of entries) {
+    const indent = depth * 18;
+    const isGit = name==='.git';
+    const isNM  = name==='node_modules';
+
+    const icon   = isDir ? (isGit?'🔧':isNM?'📦':'📁') : fileIcon(name);
+    const lClass = isGit||isNM ? 'special' : isDir ? 'dir' : '';
+    const canOpen = isDir && !isGit && !isNM;
+
+    const row = document.createElement('div');
+    row.className = 't-row' + (canOpen?' clickable':'');
+    row.style.paddingLeft = indent+'px';
+    row.innerHTML = `
+      <span class="t-chevron">${canOpen?'▶':''}</span>
+      <span class="t-icon">${icon}</span>
+      <span class="t-label ${lClass}">${name}</span>
+      ${canOpen?`<span class="t-count"></span>`:''}
+    `;
+    container.appendChild(row);
+
+    if (canOpen) {
+      const childWrap = document.createElement('div');
+      childWrap.className = 't-children';
+      container.appendChild(childWrap);
+
+      const chevron = row.querySelector('.t-chevron');
+      const countEl = row.querySelector('.t-count');
+      let loaded    = false;
+
+      row.addEventListener('click', async (ev) => {
+        ev.stopPropagation();
+        const isOpen = childWrap.classList.toggle('open');
+        chevron.textContent = isOpen ? '▼' : '▶';
+
+        if (isOpen && !loaded) {
+          loaded = true;
+          const tmp = document.createElement('div');
+          tmp.className = 't-loading';
+          tmp.style.paddingLeft = (indent+18)+'px';
+          tmp.textContent = 'Lade…';
+          childWrap.appendChild(tmp);
+
+          await buildTree(childWrap, handle, depth+1);
+          childWrap.removeChild(tmp);
+
+          const cnt = childWrap.querySelectorAll(':scope > .t-row').length;
+          if (countEl) countEl.textContent = '(' + cnt + ')';
+        }
+      });
+    }
+  }
+}
+
+/* ── File icons ────────────────────────────────────────── */
+function fileIcon(name) {
+  const ext = name.split('.').pop().toLowerCase();
+  const m = {
+    js:'🟨',mjs:'🟨',cjs:'🟨',
+    ts:'🔷',tsx:'🔷',
+    jsx:'🟦',
+    html:'🟧',htm:'🟧',
+    css:'🎨',scss:'🎨',sass:'🎨',less:'🎨',
+    json:'📋',jsonc:'📋',
+    md:'📝',mdx:'📝',
+    txt:'📄',
+    py:'🐍',
+    rs:'🦀',
+    go:'🐹',
+    rb:'💎',
+    java:'☕',
+    cpp:'⚙️',cc:'⚙️',c:'⚙️',h:'⚙️',hpp:'⚙️',
+    sh:'🖥️',bash:'🖥️',zsh:'🖥️',fish:'🖥️',
+    yml:'⚙️',yaml:'⚙️',
+    toml:'⚙️',
+    ini:'⚙️',cfg:'⚙️',conf:'⚙️',
+    env:'🔐',
+    svg:'🖼️',png:'🖼️',jpg:'🖼️',jpeg:'🖼️',gif:'🖼️',webp:'🖼️',ico:'🖼️',
+    pdf:'📕',
+    zip:'📦',tar:'📦',gz:'📦',rar:'📦',
+    lock:'🔒',
+    dockerfile:'🐳',
+    xml:'📋',
+    sql:'🗃️',
+    graphql:'📊',gql:'📊',
+    vue:'💚',svelte:'🔥',
+    kt:'🟣',swift:'🟠',dart:'💙',
+  };
+  if (name==='.gitignore'||name==='.gitattributes') return '🚫';
+  if (name==='Makefile'||name==='makefile')          return '🔨';
+  if (name==='LICENSE'||name==='LICENSE.md')         return '⚖️';
+  return m[ext] || '📄';
+}
+
+/* ── Helpers ───────────────────────────────────────────── */
+
+function setLoad(on) {
+  document.getElementById('loadBar').classList.toggle('on', on);
+  document.getElementById('btnRun').disabled = on;
+}
+function showErr(msg) {
+  const el = document.getElementById('errBox');
+  el.textContent = msg; el.style.display='block';
+}
+function hideErr() { document.getElementById('errBox').style.display='none'; }
+
+/* ── Remember username ─────────────────────────────────── */
+(function() {
+  const saved = localStorage.getItem('gh_username');
+  if (saved) {
+    const el = document.getElementById('username');
+    if (el) { el.value = saved; checkReady(); }
+  }
+})();
+
+document.getElementById('username').addEventListener('change', function() {
+  if (this.value.trim()) localStorage.setItem('gh_username', this.value.trim());
+});
+
+/* ── Fullscreen ─────────────────────────────────────────── */
+function toggleFullscreen() {
+  const btn = document.getElementById('fsBtn');
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().then(() => {
+      btn.textContent = '✕';
+      btn.title = 'Vollbild beenden';
+    }).catch(() => {});
+  } else {
+    document.exitFullscreen().then(() => {
+      btn.textContent = '⛶';
+      btn.title = 'Vollbild';
+    }).catch(() => {});
+  }
+}
+
+document.addEventListener('fullscreenchange', () => {
+  const btn = document.getElementById('fsBtn');
+  if (!document.fullscreenElement) {
+    btn.textContent = '⛶';
+    btn.title = 'Vollbild';
+  }
+});
+</script>
+</body>
+</html>
