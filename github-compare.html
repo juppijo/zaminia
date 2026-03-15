@@ -655,8 +655,13 @@ async function toggleTree(e, idx, repoName) {
   panel.innerHTML = '<div class="t-loading" style="padding:12px">Lade Verzeichnis…</div>';
   const wrap = document.createElement('div');
   wrap.className = 'tree';
-  await buildTree(wrap, repo.localHandle, 0);
+  const totalCount = await buildTree(wrap, repo.localHandle, 0);
   panel.innerHTML = '';
+  // Header with total count
+  const hdr = document.createElement('div');
+  hdr.style.cssText = 'padding:8px 14px 6px;font-size:.68rem;color:var(--text-dim);border-bottom:1px solid var(--border);display:flex;gap:16px;';
+  hdr.innerHTML = `<span>📁 <strong style="color:var(--text-bright)">${repo.localHandle.name}</strong></span><span style="margin-left:auto">📄 <strong style="color:var(--accent)">${totalCount}</strong> Dateien insgesamt</span>`;
+  panel.appendChild(hdr);
   panel.appendChild(wrap);
 }
 
@@ -948,28 +953,47 @@ async function startSync(e, idx) {
   }
 }
 
+/* ── Count all files recursively ───────────────────────── */
+async function countAllFiles(dirHandle, depth=0) {
+  if (depth > 8) return 0;
+  const skip = new Set(['node_modules','.git','__pycache__','dist','build','.next','.nuxt','vendor','.venv','venv']);
+  let count = 0;
+  try {
+    for await (const [name, handle] of dirHandle.entries()) {
+      if (skip.has(name) || name.startsWith('.')) continue;
+      if (handle.kind === 'file') count++;
+      else count += await countAllFiles(handle, depth+1);
+    }
+  } catch {}
+  return count;
+}
+
 /* ── Build file tree ───────────────────────────────────── */
+// Returns total file count (files only, not dirs)
 async function buildTree(container, dirHandle, depth) {
   const entries = [];
   try {
     for await (const [name, handle] of dirHandle.entries()) {
       entries.push({ name, handle, isDir: handle.kind==='directory' });
     }
-  } catch { return; }
+  } catch { return 0; }
 
   entries.sort((a,b)=>{
     if (a.isDir!==b.isDir) return a.isDir?-1:1;
     return a.name.localeCompare(b.name);
   });
 
-  for (const { name, handle, isDir } of entries) {
-    const indent = depth * 18;
-    const isGit = name==='.git';
-    const isNM  = name==='node_modules';
+  let totalFiles = 0;
 
-    const icon   = isDir ? (isGit?'🔧':isNM?'📦':'📁') : fileIcon(name);
-    const lClass = isGit||isNM ? 'special' : isDir ? 'dir' : '';
+  for (const { name, handle, isDir } of entries) {
+    const indent  = depth * 18;
+    const isGit   = name==='.git';
+    const isNM    = name==='node_modules';
+    const icon    = isDir ? (isGit?'🔧':isNM?'📦':'📁') : fileIcon(name);
+    const lClass  = isGit||isNM ? 'special' : isDir ? 'dir' : '';
     const canOpen = isDir && !isGit && !isNM;
+
+    if (!isDir) totalFiles++;
 
     const row = document.createElement('div');
     row.className = 't-row' + (canOpen?' clickable':'');
@@ -1004,15 +1028,29 @@ async function buildTree(container, dirHandle, depth) {
           tmp.textContent = 'Lade…';
           childWrap.appendChild(tmp);
 
-          await buildTree(childWrap, handle, depth+1);
+          const subCount = await buildTree(childWrap, handle, depth+1);
           childWrap.removeChild(tmp);
 
-          const cnt = childWrap.querySelectorAll(':scope > .t-row').length;
-          if (countEl) countEl.textContent = '(' + cnt + ')';
+          // Show: (N Dateien) for subdirs
+          if (countEl) {
+            const dirItems = childWrap.querySelectorAll(':scope > .t-row').length;
+            countEl.textContent = `(${subCount} Datei${subCount===1?'':'en'}, ${dirItems} Eintr${dirItems===1?'ag':'äge'})`;
+          }
         }
       });
+
+      // Pre-count for display before opening
+      (async () => {
+        const preCount = await countAllFiles(handle);
+        totalFiles += preCount;
+        if (countEl && !loaded) {
+          countEl.textContent = `(${preCount} Datei${preCount===1?'':'en'})`;
+        }
+      })();
     }
   }
+
+  return totalFiles;
 }
 
 /* ── File icons ────────────────────────────────────────── */
