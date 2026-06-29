@@ -12,6 +12,18 @@
             --accent-yellow: #ffd460;
             --text-color: #2d3748;
             --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+        }
+
+        /* Dark Mode Variablen */
+        [data-theme="dark"] {
+            --bg-color: #1a202c;
+            --primary-color: #4fd1c5;
+            --secondary-color: #81e6d9;
+            --accent-yellow: #f6e05e;
+            --text-color: #e2e8f0;
+            --card-bg: #2d3748;
+            --border-color: #4a5568;
         }
 
         body {
@@ -21,6 +33,7 @@
             line-height: 1.6;
             margin: 0;
             padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .container {
@@ -31,12 +44,46 @@
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 168, 181, 0.1);
             border-top: 8px solid var(--primary-color);
+            transition: background-color 0.3s;
+        }
+
+        /* Control Panel für die neuen Buttons */
+        .control-panel {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: var(--card-bg);
+            border: none;
+            padding: 10px 20px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s, background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
         }
 
         header {
             text-align: center;
             margin-bottom: 40px;
-            position: relative;
         }
 
         h1 {
@@ -53,7 +100,7 @@
 
         h2 {
             color: var(--secondary-color);
-            border-bottom: 2px solid var(--bg-color);
+            border-bottom: 2px solid var(--border-color);
             padding-bottom: 8px;
             display: flex;
             align-items: center;
@@ -78,6 +125,7 @@
             padding: 20px;
             border-radius: 15px;
             border-left: 5px solid var(--primary-color);
+            transition: background-color 0.3s;
         }
 
         ul {
@@ -110,12 +158,8 @@
             margin-bottom: 15px;
         }
 
-        ol li::before {
-            display: none;
-        }
-
         .note-box {
-            background: #fffdf3;
+            background: rgba(255, 212, 96, 0.1);
             border: 1px dashed var(--accent-yellow);
             padding: 15px;
             border-radius: 12px;
@@ -123,45 +167,32 @@
             font-size: 0.95rem;
         }
 
-        /* --- Animationen für Emojis --- */
+        /* --- Animationen --- */
         .animated-emoji {
             display: inline-block;
             font-size: 1.5rem;
             vertical-align: middle;
         }
 
-        /* Rotation für die Pfanne */
-        .spin {
-            animation: spinAnim 3s linear infinite;
-        }
+        .spin { animation: spinAnim 3s linear infinite; }
         @keyframes spinAnim {
-            0% { transform: rotate(0deg); }
+            0%, 100% { transform: rotate(0deg); }
             50% { transform: rotate(15deg); }
-            100% { transform: rotate(0deg); }
         }
 
-        /* Hüpfen für den Salat */
-        .bounce {
-            animation: bounceAnim 2s ease-in-out infinite;
-        }
+        .bounce { animation: bounceAnim 2s ease-in-out infinite; }
         @keyframes bounceAnim {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-8px); }
         }
 
-        /* Schwebend für das Dressing */
-        .float {
-            animation: floatAnim 2.5s ease-in-out infinite;
-        }
+        .float { animation: floatAnim 2.5s ease-in-out infinite; }
         @keyframes floatAnim {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-4px) scale(1.1); }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
         }
 
-        /* Pulsieren für das Herz */
-        .pulse {
-            animation: pulseAnim 1.5s infinite;
-        }
+        .pulse { animation: pulseAnim 1.5s infinite; }
         @keyframes pulseAnim {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.2); }
@@ -177,44 +208,48 @@
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="recipeContainer">
+    
+    <div class="control-panel">
+        <button class="btn" id="themeBtn">🎨 Design wechseln</button>
+        <button class="btn" id="ttsBtn">🔊 Rezept vorlesen</button>
+        <button class="btn" id="fullscreenBtn">📺 Vollbild</button>
+    </div>
+
     <header>
-        <h1>Bunter Sommer-Sonnen-Salat <span class="animated-emoji bounce">🥗</span></h1>
+        <h1 id="recipeTitle">Bunter Sommer-Sonnen-Salat <span class="animated-emoji bounce">🥗</span></h1>
         <p class="subtitle">Gemeinsam kreiert von Jup & Zaminia</p>
     </header>
 
     <div class="grid">
-        <!-- Dressing Karte -->
-        <div class="recipe-card">
+        <div class="recipe-card" id="dressingCard">
             <h2>Zamis Joghurt-Dressing <span class="animated-emoji float">🥛</span></h2>
             <ul>
-                <li><strong>150 g</strong> Naturjoghurt (3,5%)</li>
-                <li><strong>1 EL</strong> Olivenöl</li>
-                <li><strong>1 TL</strong> Zitronensaft (frisch)</li>
-                <li><strong>1 TL</strong> Honig oder Agavendicksaft</li>
-                <li><strong>1 TL</strong> Senf (mittelscharf)</li>
-                <li>Salz & schwarzer Pfeffer</li>
-                <li>Frische Kräuter (Schnittlauch/Dill)</li>
+                <li>150 Gramm Naturjoghurt</li>
+                <li>1 Esslöffel Olivenöl</li>
+                <li>1 Teelöffel Zitronensaft</li>
+                <li>1 Teelöffel Honig</li>
+                <li>1 Teelöffel mittelscharfer Senf</li>
+                <li>Salz und schwarzer Pfeffer</li>
+                <li>Frische Kräuter wie Schnittlauch oder Dill</li>
             </ul>
         </div>
 
-        <!-- Salat Zutaten Karte -->
-        <div class="recipe-card">
+        <div class="recipe-card" id="saladCard">
             <h2>Die Salat-Basis <span class="animated-emoji bounce">🥬</span></h2>
             <ul>
-                <li><strong>1 Packung</strong> bunte Sommer-Salatmischung</li>
-                <li><strong>1</strong> gelbe Paprika</li>
-                <li><strong>1</strong> gelbe Zucchini</li>
-                <li><strong>150 g</strong> Hühnchen- oder Rinderstreifen</li>
-                <li><strong>100 g</strong> Feta-Käse</li>
-                <li><strong>1 Kugel</strong> Mozzarella</li>
+                <li>1 Packung bunte Sommer-Salatmischung</li>
+                <li>Eine gelbe Paprika</li>
+                <li>Eine gelbe Zucchini</li>
+                <li>150 Gramm Hühnchen- oder Rinderstreifen</li>
+                <li>100 Gramm Feta-Käse</li>
+                <li>Eine Kugel Mozzarella</li>
                 <li>Etwas Öl zum Anbraten</li>
             </ul>
         </div>
     </div>
 
-    <!-- Zubereitung -->
-    <section>
+    <section id="stepsCard">
         <h2>Zubereitung <span class="animated-emoji spin">🍳</span></h2>
         <ol>
             <li><strong>Das Dressing anrühren:</strong> Joghurt, Senf, Honig, Zitronensaft und Olivenöl in einer Schüssel cremig schlagen, bis ein glattes, helles Kunstwerk entsteht. Mit Salz, Pfeffer und Kräutern abschmecken.</li>
@@ -233,6 +268,93 @@
         Guten Appetit! Entwickelt mit Liebe und einer Prise Kreativität <span class="animated-emoji pulse">❤️</span>
     </footer>
 </div>
+
+<script>
+    // --- 1. DESIGN WECHSLER (DARK MODE) ---
+    const themeBtn = document.getElementById('themeBtn');
+    themeBtn.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        if (currentTheme === 'dark') {
+            document.documentElement.removeAttribute('data-theme');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    });
+
+    // --- 2. VOLLBILD MODUS ---
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const container = document.getElementById('recipeContainer');
+
+    fullscreenBtn.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+            container.requestFullscreen().catch(err => {
+                alert(`Fehler beim Aktivieren des Vollbildmodus: ${err.message}`);
+            });
+            fullscreenBtn.textContent = '❌ Vollbild beenden';
+        } else {
+            document.exitFullscreen();
+            fullscreenBtn.textContent = '📺 Vollbild';
+        }
+    });
+
+    // Falls Vollbild mit der ESC-Taste beendet wird, Button-Text anpassen
+    document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) {
+            fullscreenBtn.textContent = '📺 Vollbild';
+        }
+    });
+
+    // --- 3. VORLESE FUNKTION (TEXT-TO-SPEECH) ---
+    const ttsBtn = document.getElementById('ttsBtn');
+    let isSpeaking = false;
+    let speechSynth = window.speechSynthesis;
+    let utterance;
+
+    ttsBtn.addEventListener('click', () => {
+        if (isSpeaking) {
+            speechSynth.cancel();
+            isSpeaking = false;
+            ttsBtn.textContent = '🔊 Rezept vorlesen';
+            return;
+        }
+
+        // Text zusammenbauen, der vorgelesen werden soll
+        let textToRead = "Bunter Sommer-Sonnen-Salat. ";
+        
+        textToRead += "Zutaten für das Dressing: ";
+        const dressingItems = document.querySelectorAll('#dressingCard li');
+        dressingItems.forEach(item => textToRead += item.textContent + ", ");
+
+        textToRead += "Zutaten für die Salat-Basis: ";
+        const saladItems = document.querySelectorAll('#saladCard li');
+        saladItems.forEach(item => textToRead += item.textContent + ", ");
+
+        textToRead += "Zubereitung: ";
+        const steps = document.querySelectorAll('#stepsCard ol li');
+        steps.forEach((step, index) => {
+            textToRead += `Schritt ${index + 1}: ${step.textContent} `;
+        });
+
+        // Sprachausgabe konfigurieren
+        utterance = new SpeechSynthesisUtterance(textToRead);
+        utterance.lang = 'de-DE'; // Auf Deutsch stellen
+        utterance.rate = 1.0;     // Normale Geschwindigkeit
+
+        utterance.onend = () => {
+            isSpeaking = false;
+            ttsBtn.textContent = '🔊 Rezept vorlesen';
+        };
+
+        utterance.onerror = () => {
+            isSpeaking = false;
+            ttsBtn.textContent = '🔊 Rezept vorlesen';
+        };
+
+        speechSynth.speak(utterance);
+        isSpeaking = true;
+        ttsBtn.textContent = '🛑 Vorlesen stoppen';
+    });
+</script>
 
 </body>
 </html>
