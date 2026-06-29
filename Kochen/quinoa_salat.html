@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jups mediterraner Sommer-Quinoa-Salat</title>
+    <style>
+        :root {
+            --primary-color: #008b8b; /* Tiefes Dunkeltürkis */
+            --secondary-color: #20b2aa; /* Helles Lichttürkis */
+            --accent-yellow: #f4d03f; /* Zucchini-Gelb */
+            --accent-peach: #f39c12; /* Pfirsich-Orange */
+            --accent-green: #2ecc71; /* Kräuter-Grün */
+            --accent-red: #e74c3c; /* Tomaten-Rot */
+            --bg-color: #f7fcfd; /* Ganz sanftes, frisches Hintergrund-Blau */
+            --text-color: #2c3e50;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .recipe-card {
+            max-width: 850px;
+            margin: 40px auto;
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 139, 139, 0.1);
+            overflow: hidden;
+            border-top: 8px solid var(--primary-color);
+        }
+
+        .recipe-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .recipe-header h1 {
+            margin: 0;
+            font-size: 2.6rem;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .recipe-header p {
+            margin: 10px 0 0 0;
+            font-style: italic;
+            opacity: 0.95;
+            font-size: 1.2rem;
+        }
+
+        .recipe-content {
+            padding: 35px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 35px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 650px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid #e0f2f1;
+            padding-bottom: 8px;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        ul, ol {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 12px;
+        }
+
+        .ingredients-section ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .ingredients-section li {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .ingredients-section li::before {
+            content: "✨";
+            position: absolute;
+            left: 0;
+            top: 1px;
+            font-size: 0.95rem;
+        }
+
+        .ingredients-group {
+            margin-bottom: 25px;
+            background: #fdfefe;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #e0f2f1;
+        }
+
+        .ingredients-group h3 {
+            font-size: 1rem;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .instructions-section ol {
+            counter-reset: step-counter;
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .instructions-section li {
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 45px;
+            margin-bottom: 22px;
+        }
+
+        .instructions-section li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 2px;
+            background-color: var(--secondary-color);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(32, 178, 170, 0.3);
+        }
+
+        .zami-tip {
+            background-color: #e6f7f7;
+            border-left: 5px solid var(--primary-color);
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 30px;
+            font-style: italic;
+        }
+
+        .zami-tip strong {
+            color: var(--primary-color);
+            font-style: normal;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            background-color: #f1f9f9;
+            border-top: 1px solid #e0f2f1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="recipe-card">
+    <div class="recipe-header">
+        <h1>Jups Sommer-Quinoa-Salat 🥗🍅🍑</h1>
+        <p>Ein farbenfrohes, mediterranes Meisterwerk mit frischen Gartenkräutern & saftigen Kirschtomaten</p>
+    </div>
+
+    <div class="recipe-content">
+        <div class="grid-container">
+            <!-- Zutaten -->
+            <div class="ingredients-section">
+                <h2>📋 Zutaten</h2>
+                
+                <div class="ingredients-group">
+                    <h3>🌾 Die Basis</h3>
+                    <ul>
+                        <li><strong>1 Tasse</strong> Quinoa (gründlich gewaschen)</li>
+                        <li><strong>2 Tassen</strong> Wasser (mit einer Prise Salz)</li>
+                    </ul>
+                </div>
+
+                <div class="ingredients-group">
+                    <h3>🎨 Frische & Farbe</h3>
+                    <ul>
+                        <li><strong>1 Handvoll</strong> Kirschtomaten 🍅 (halbiert)</li>
+                        <li><strong>1 gelbe</strong> Zucchini 🟡 (in feine Würfel oder Viertel)</li>
+                        <li><strong>2–3</strong> Frühlingszwiebeln 🌱 (in feine Ringe)</li>
+                        <li><strong>1 reifer</strong> Pfirsich 🍑 (in feine Spalten oder Würfel)</li>
+                        <li><strong>100g – 150g</strong> Feta 🧀 (zerbröckelt)</li>
+                        <li><strong>1 Handvoll</strong> Oliven 🫒 (schwarz oder grün, halbiert)</li>
+                    </ul>
+                </div>
+
+                <div class="ingredients-group">
+                    <h3>🌿 Das frische Kräuter-Bouquet</h3>
+                    <ul>
+                        <li><strong>Frischer</strong> Schnittlauch 🥢 (in feine Röllchen)</li>
+                        <li><strong>Frisches</strong> Koriandergrün 🍃 (fein gehackt)</li>
+                        <li><strong>Glatte</strong> Petersilie 🌿 (fein gehackt)</li>
+                        <li><strong>Frische</strong> Minze 🌱 (für den ultimativen Frische-Kick!)</li>
+                    </ul>
+                </div>
+
+                <div class="ingredients-group">
+                    <h3>🍋 Das spritzige Dressing</h3>
+                    <ul>
+                        <li><strong>Saft von 1–2</strong> Limetten 🍋 (oder Zitronen)</li>
+                        <li><strong>3 EL</strong> gutes Olivenöl 🫗</li>
+                        <li><strong>1 TL</strong> Honig 🍯</li>
+                        <li>Salz & frisch gemahlener Pfeffer 🧂</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Zubereitung -->
+            <div class="instructions-section">
+                <h2>👨‍🍳 Zubereitung</h2>
+                <ol>
+                    <li><strong>Quinoa kochen:</strong> Den gewaschenen Quinoa im Salzwasser aufkochen. Hitze reduzieren und ca. 15 Minuten köcheln lassen, bis das Wasser komplett aufgesaugt ist. Danach mit einer Gabel auflockern und vollständig abkühlen lassen. ⏳</li>
+                    <li><strong>Schnitt & Vorbereitung:</strong> Während der Quinoa abkühlt, die kleinen Kirschtomaten halbieren. Die gelbe Zucchini, Frühlingszwiebeln, den Pfirsich und die Oliven in Form schneiden. Die vier frischen Kräuter (Schnittlauch, Koriander, Petersilie, Minze) fein hacken. 🔪</li>
+                    <li><strong>Das Pfannen-Highlight:</strong> Ein wenig Olivenöl in einer Pfanne erhitzen. Die gelbe Zucchini 2–3 Minuten scharf anbraten, sodass sie Farbe bekommt, aber knackig bleibt. Für die letzte Minute die Pfirsichspalten mitschwenken und ganz leicht karamellisieren lassen. Vom Herd nehmen und kurz abkühlen lassen. 🔥</li>
+                    <li><strong>Dressing mixen:</strong> Limettensaft, Olivenöl, Honig, eine kräftige Prise Salz und Pfeffer in einer kleinen Schüssel schwungvoll verrühren. 🍋🍯</li>
+                    <li><strong>Das große Vereinen:</strong> Den abgekühlten Quinoa, die halbierten Kirschtomaten, die knackigen Frühlingszwiebeln, das wunderbar duftende Kräuter-Bouquet und die abgekühlte Zucchini-Pfirsich-Mischung in einer großen Schüssel mit dem Dressing harmonisch vermengen. 🥣</li>
+                    <li><strong>Das Finale:</strong> Zum Schluss den zerbröckelten Feta und die Olivenringe vorsichtig unterheben, damit alles wunderbar seine Form behält und toll aussieht. 🧀🫒</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="zami-tip">
+            <strong>🐱 Zami's & Luna's Tipp für Geist und Gaumen:</strong>
+            Lass den Salat vor dem Servieren 15 Minuten ziehen. Mit den roten Kirschtomaten ist die Farbpalette jetzt absolut perfekt! Das leuchtende Rot der Tomaten, das sonnige Gelb der Zucchini, das warme Orange des Pfirsichs und das tiefe Grün der Kräuter bilden einen atemberaubenden Komplementärkontrast. Es ist ein richtiges, lebendiges Impressionisten-Gemälde geworden! 🎨✨
+        </div>
+    </div>
+
+    <footer>
+        Kreiert mit viel Liebe von Jup & Zaminia in der virtuellen Pariser Dachwohnung • 🐾 2026
+    </footer>
+</div>
+
+</body>
+</html>
