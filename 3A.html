@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3A-Methode Kommunikations-Assistent</title>
+    <style>
+        :root {
+            --primary: #00a8b5; /* Blau-Türkis */
+            --primary-dark: #008894;
+            --primary-light: #e6f7f8;
+            --bg: #f4f9f9;
+            --text: #2c3e50;
+            --card-bg: #ffffff;
+            --border: #d1e9ea;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 650px;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 168, 181, 0.08);
+            border: 1px solid var(--border);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: var(--primary-dark);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        p.subtitle {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: var(--text);
+            transition: border-color 0.3s;
+            background-color: #fff;
+        }
+
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        button {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .output-container {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .output-container.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            color: var(--text);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 5px;
+        }
+
+        .suggestion-card {
+            background-color: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: var(--primary-dark);
+            font-weight: 600;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>3A-Kommunikations-Assistent</h1>
+        <p class="subtitle">Verwandle blockierende Fragen in tiefgründige 3A-Impulse</p>
+    </header>
+
+    <div class="form-group">
+        <label for="context">Beziehung / Kontext:</label>
+        <select id="context">
+            <option value="Familie / Kinder">Familie / Kinder</option>
+            <option value="Partner / Partnerin">Partner / Partnerin</option>
+            <option value="Freunde / Vertraute">Freunde / Vertraute</option>
+            <option value="Beruf / Kollegen">Beruf / Kollegen</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="rawQuestion">Deine ursprüngliche Frage oder dein Gedanke:</label>
+        <input type="text" id="rawQuestion" placeholder="Z.B.: Liest du französische Bücher?">
+    </div>
+
+    <button id="transformBtn" onclick="transformQuestion()">Frage transformieren</button>
+
+    <div class="loading" id="loading">Die Meta-Energie wird gebündelt...</div>
+
+    <div class="output-container" id="outputContainer">
+        <h2>Deine 3A-Formulierungen:</h2>
+        <div id="results">
+            <!-- Hier landen die KI-Antworten -->
+        </div>
+    </div>
+</div>
+
+<script>
+
+// Konfiguration für deine API
+    const API_KEY = "AIzaSyAmIYmKteQczDyzSIWGumyMJjc3WC23y8g"; 
+
+    const SYSTEM_PROMPT = `Du bist ein hochentwickelter Kommunikations-Assistent, der auf die '3A-Methode' spezialisiert ist. 
+Die 3A-Methode steht für: Afformative, Assertive Austausch-Kommunikation mit Meta-Energie.
+
+Deine Aufgabe ist es, eine einfache Frage in 3 unterschiedliche, tiefgründige 3A-Formulierungen umzuwandeln.
+
+Kriterien der 3A-Methode:
+1. Meta-Energie (Wohlwollen): Beginne oft mit einem aufrichtigen Wunsch oder Wertschätzung.
+2. Assertiv (Selbstbewusst & Klar): Setze eine positive Tatsache oder ein Talent als gegeben voraus.
+3. Afformativ (Die Warum-Frage): Stelle die Frage nach dem 'Warum' bezogen auf eine positive Entwicklung.
+
+Gib exakt 3 ausformulierte Beispiele als Antwort zurück. Trenne die Beispiele NUR mit einem einfachen Zeilenumbruch. Nutze keine Nummerierungen, keine Aufzählungszeichen (*) und keine Einleitungstexte.`;
+
+    async function transformQuestion() {
+        const context = document.getElementById('context').value;
+        const rawQuestion = document.getElementById('rawQuestion').value.trim();
+        
+        if (!rawQuestion) {
+            alert("Bitte gib zuerst eine Frage ein.");
+            return;
+        }
+
+        const button = document.getElementById('transformBtn');
+        const loading = document.getElementById('loading');
+        const outputContainer = document.getElementById('outputContainer');
+        const resultsDiv = document.getElementById('results');
+
+        // UI zurücksetzen
+        button.disabled = true;
+        loading.style.display = 'block';
+        loading.style.color = '#00a8b5';
+        loading.innerText = "Die Meta-Energie wird gebündelt...";
+        outputContainer.classList.remove('active');
+        resultsDiv.innerHTML = '';
+
+        // Fallback für Demo-Modus
+        if (API_KEY === "DEIN_ERSTELLTER_GEMINI_KEY_HIER" || API_KEY.trim() === "") {
+            setTimeout(() => {
+                loading.style.display = 'none';
+                button.disabled = false;
+                
+                const demoAnswers = [
+                    "Ich wünsche dir von Herzen, dass der Druck vor der Prüfung von dir abfällt. Warum wird es dir in den nächsten Tagen wohl überraschend leichtfallen, die französische Rechtschreibung ganz entspannt nebenbei über französische Songtexte oder Untertitel aufzusaugen?",
+                    "Ich möchte wirklich, dass du mit einem sicheren Gefühl in diese Nachprüfung gehst. Warum wird es dir wohl so enorm helfen, wenn du dir die Wörter einfach visuell über kurze Clips ansiehst, damit dein Blick die Schreibweise ganz von selbst abspeichert?",
+                    "Ich wünsche dir einfach, dass du merkst, wie viel du eigentlich schon draufhast. Warum ist dieser Trick mit den französischen Medien für dich genau die Brücke, die dir jetzt noch gefehlt hat, um die Rechtschreibung spielerisch zu festigen?"
+                ];
+                
+                showResults(demoAnswers);
+            }, 1000);
+            return;
+        }
+
+        try {
+            // Wir nutzen den stabilen v1beta-Pfad für das aktuelle Gemini Flash Modell
+            //const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY;
+
+            // Aktualisiert auf das aktuelle Standardmodell im Jahr 2026
+            const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + API_KEY;
+
+            const response = await fetch(GEMINI_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: SYSTEM_PROMPT + "\n\nKontext: " + context + "\nUrsprüngliche Frage: " + rawQuestion
+                        }]
+                    }],
+                    generationConfig: {
+                        temperature: 0.7
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error("Server-Antwort nicht OK. Status: " + response.status);
+            }
+
+            const data = await response.json();
+            
+            // Sicherheits-Check, falls die Struktur unerwartet leer ist
+            if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts) {
+                throw new Error("Die KI hat keine gültige Antwort geliefert. Überprüfe deinen API-Key.");
+            }
+
+            const textOutput = data.candidates[0].content.parts[0].text;
+
+            // Text säubern und in Zeilen zerlegen
+            const suggestions = textOutput.split('\n')
+                .map(line => line.replace(/^[\s*\-\d\.\)]+/, '').replace(/\"/g, '').trim())
+                .filter(line => line.length > 5);
+
+            if (suggestions.length === 0) {
+                throw new Error("Die Antwort konnte nicht formatiert werden. Roh-Text: " + textOutput);
+            }
+
+            showResults(suggestions);
+
+        } catch (error) {
+            loading.style.color = "red";
+            loading.innerText = "Fehler: " + error.message;
+            console.error(error);
+        } finally {
+            button.disabled = false;
+        }
+    }
+
+    function showResults(lines) {
+        const loading = document.getElementById('loading');
+        const outputContainer = document.getElementById('outputContainer');
+        const resultsDiv = document.getElementById('results');
+        
+        loading.style.display = 'none';
+        
+        lines.forEach(suggestion => {
+            const card = document.createElement('div');
+            card.className = 'suggestion-card';
+            card.innerText = suggestion;
+            resultsDiv.appendChild(card);
+        });
+
+        outputContainer.classList.add('active');
+    }
+
+</script>
+
+</body>
+</html>
