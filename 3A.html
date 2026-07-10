@@ -180,8 +180,9 @@
 
 <script>
 
-// Konfiguration für deine API
-    const API_KEY = "AIzaSyAmIYmKteQczDyzSIWGumyMJjc3WC23y8g"; 
+    // Konfiguration für die Mistral AI API
+    const API_KEY = "DdYXru5rkrACFiEdsuh3jLpqtkeho7jE"; 
+    const API_URL = "https://api.mistral.ai/v1/chat/completions";
 
     const SYSTEM_PROMPT = `Du bist ein hochentwickelter Kommunikations-Assistent, der auf die '3A-Methode' spezialisiert ist. 
 Die 3A-Methode steht für: Afformative, Assertive Austausch-Kommunikation mit Meta-Energie.
@@ -218,7 +219,7 @@ Gib exakt 3 ausformulierte Beispiele als Antwort zurück. Trenne die Beispiele N
         resultsDiv.innerHTML = '';
 
         // Fallback für Demo-Modus
-        if (API_KEY === "DEIN_ERSTELLTER_GEMINI_KEY_HIER" || API_KEY.trim() === "") {
+        if (API_KEY === "DEIN_MISTRAL_API_KEY_HIER" || API_KEY.trim() === "") {
             setTimeout(() => {
                 loading.style.display = 'none';
                 button.disabled = false;
@@ -235,26 +236,20 @@ Gib exakt 3 ausformulierte Beispiele als Antwort zurück. Trenne die Beispiele N
         }
 
         try {
-            // Wir nutzen den stabilen v1beta-Pfad für das aktuelle Gemini Flash Modell
-            //const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY;
-
-            // Aktualisiert auf das aktuelle Standardmodell im Jahr 2026
-            const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + API_KEY;
-
-            const response = await fetch(GEMINI_URL, {
+            const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': "Bearer " + API_KEY
                 },
                 body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: SYSTEM_PROMPT + "\n\nKontext: " + context + "\nUrsprüngliche Frage: " + rawQuestion
-                        }]
-                    }],
-                    generationConfig: {
-                        temperature: 0.7
-                    }
+                    model: "mistral-small-latest",
+                    messages: [
+                        { role: "system", content: SYSTEM_PROMPT },
+                        { role: "user", content: "Kontext: " + context + "\nUrsprüngliche Frage: " + rawQuestion }
+                    ],
+                    temperature: 0.7
                 })
             });
 
@@ -263,13 +258,7 @@ Gib exakt 3 ausformulierte Beispiele als Antwort zurück. Trenne die Beispiele N
             }
 
             const data = await response.json();
-            
-            // Sicherheits-Check, falls die Struktur unerwartet leer ist
-            if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts) {
-                throw new Error("Die KI hat keine gültige Antwort geliefert. Überprüfe deinen API-Key.");
-            }
-
-            const textOutput = data.candidates[0].content.parts[0].text;
+            const textOutput = data.choices[0].message.content;
 
             // Text säubern und in Zeilen zerlegen
             const suggestions = textOutput.split('\n')
@@ -277,7 +266,7 @@ Gib exakt 3 ausformulierte Beispiele als Antwort zurück. Trenne die Beispiele N
                 .filter(line => line.length > 5);
 
             if (suggestions.length === 0) {
-                throw new Error("Die Antwort konnte nicht formatiert werden. Roh-Text: " + textOutput);
+                throw new Error("Die Antwort konnte nicht formatiert werden.");
             }
 
             showResults(suggestions);
