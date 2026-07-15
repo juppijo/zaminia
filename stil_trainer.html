@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stylistique Française - Interaktiver Trainer</title>
+    <style>
+        :root {
+            --primary: #00a8b5; /* Dein charakteristisches Blau-Türkis */
+            --primary-dark: #008894;
+            --primary-light: #e6f7f8;
+            --bg: #f4f9f9;
+            --text: #2c3e50;
+            --card-bg: #ffffff;
+            --border: #d1e9ea;
+            --accent-orange: #ff7e67;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 800px;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 168, 181, 0.08);
+            border: 1px solid var(--border);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--primary-dark);
+            font-size: 1.9rem;
+            margin-bottom: 5px;
+        }
+
+        p.subtitle {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: var(--text);
+            transition: border-color 0.3s;
+            background-color: #fff;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .preset-container {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+            border: 1px solid var(--primary);
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .preset-btn:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        button.action-btn {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            margin-top: 10px;
+        }
+
+        button.action-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        button.action-btn:active {
+            transform: scale(0.98);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: var(--primary-dark);
+            font-weight: 600;
+            margin: 20px 0;
+        }
+
+        .output-container {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .output-container.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 1.3rem;
+            color: var(--text);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 5px;
+        }
+
+        .result-section {
+            background-color: #ffffff;
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .result-title {
+            font-weight: bold;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .correction-box {
+            background-color: #f0fdf4;
+            border-left: 4px solid #16a34a;
+            padding: 12px;
+            border-radius: 0 6px 6px 0;
+            font-style: italic;
+            margin-top: 10px;
+            color: #14532d;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Analyseur de Style & Syntaxe</h1>
+        <p class="subtitle">Linguistisches Analyse-Tool für exzellentes Französisch</p>
+    </header>
+
+    <div class="form-group">
+        <label for="category">Fehlerkategorie wählen:</label>
+        <select id="category" onchange="loadPresets()">
+            <option value="solecisme">Solécismes (Grammatikalische Konstruktionsfehler)</option>
+            <option value="cliche">Clichés & Expressions à la mode (Stilistische Schwächen)</option>
+            <option value="registre">Registres de langue inappropriés (Stilebenen-Fehler)</option>
+            <option value="animisme">Animismes abusifs (Unpassende Personifikationen)</option>
+            <option value="pleonasme">Pléonasmes syntaxiques (Doppelungen)</option>
+            <option value="amphibologie">Amphibologies & Équivoques (Mehrdeutigkeiten)</option>
+            <option value="harmonie">Fautes d'harmonie (Klangliche Dissonanzen)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Musterbeispiele aus deinen Übungen (Klick zum Laden):</label>
+        <div class="preset-container" id="presets">
+            <!-- Dynamische Presets landen hier -->
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="sentence">Zu analysierender französischer Satz:</label>
+        <textarea id="sentence" placeholder="Satz hier eingeben oder oben ein Beispiel wählen..."></textarea>
+    </div>
+
+    <button class="action-btn" id="analyzeBtn" onclick="analyzeSentence()">Satz linguistisch analysieren</button>
+
+    <div class="loading" id="loading">Analysiere Stilistik und syntaktische Strukturen...</div>
+
+    <div class="output-container" id="outputContainer">
+        <h2>Expertise-Bericht (Rapport d'analyse):</h2>
+        <div id="results">
+            <!-- Hier landet die strukturierte Auswertung -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // Setze hier deinen funktionierenden Mistral API Key ein
+    //const API_KEY = "DEIN_MISTRAL_API_KEY_HIER"; 
+
+    const API_KEY = "DdYXru5rkrACFiEdsuh3jLpqtkeho7jE"; 
+    const API_URL = "https://api.mistral.ai/v1/chat/completions";
+
+    // Presets direkt aus deinen hochgeladenen Dokumenten
+    const PRESETS = {
+        solecisme: [
+            "Après avoir frôlé la mort, les journées de travail de mon père ont été réduites.",
+            "Il accuse l'opposition d'avoir truqué les élections et de collusion avec l'étranger."
+        ],
+        cliche: [
+            "Après des années de travail acharné, son projet a finalement jeté ses derniers feux sous les applaudissements de la foule.",
+            "La police a mené une enquête de choc pour élucider ce crime odieux."
+        ],
+        registre: [
+            "Le maire a chié dans les bottes de ses adversaires en annulant le projet.",
+            "Crèchant dans un petit appartement, il a du mal à joindre les deux bouts."
+        ],
+        animisme: [
+            "La loi a décidé de sanctionner les contrevenants.",
+            "L'ordinateur a refusé de sauvegarder mes fichiers."
+        ],
+        pleonasme: [
+            "Ce pays où, il y a peu, ils s'y sont rendus est magnifique.",
+            "Elle a vu de ses propres yeux l'accident se produire."
+        ],
+        amphibologie: [
+            "Il convoqua cet étudiant en médecine pour l'examiner.",
+            "J'ai vu le fils du voisin avec une loupe."
+        ],
+        harmonie: [
+            "Tout Tournai suit avec passion les aventures de l'équipe locale.",
+            "Sur présentation de la présente annonce, vous bénéficierez d'une réduction."
+        ]
+    };
+
+    const SYSTEM_PROMPT = `Tu agiras en tant qu'expert de niveau universitaire en linguistique française, spécialisé en stylistique et en syntaxe avancée.
+Ta tâche est d'analyser une phrase erronée fournie par l'utilisateur selon la catégorie stylistique demandée.
+
+Ta réponse doit obligatoirement suivre cette structure en français (et uniquement cette structure, pas de texte d'introduction) :
+
+[ANALYSE]
+Détaille précisément l'anomalie détectée (règle grammaticale ou stylistique violée de manière rigoureuse).
+
+[CORRECTION OPTIMISÉE]
+Donne la version corrigée et embellie de la phrase.
+
+[JUSTIFICATION]
+Justifie les changements apportés avec un vocabulaire académique et précis.`;
+
+    // Presets beim Laden initialisieren
+    window.onload = function() {
+        loadPresets();
+    };
+
+    function loadPresets() {
+        const category = document.getElementById('category').value;
+        const container = document.getElementById('presets');
+        container.innerHTML = '';
+
+        PRESETS[category].forEach(sentence => {
+            const btn = document.createElement('button');
+            btn.className = 'preset-btn';
+            btn.innerText = sentence.length > 50 ? sentence.substring(0, 47) + "..." : sentence;
+            btn.title = sentence;
+            btn.onclick = () => {
+                document.getElementById('sentence').value = sentence;
+            };
+            container.appendChild(btn);
+        });
+    }
+
+    async function analyzeSentence() {
+        const category = document.getElementById('category').value;
+        const sentence = document.getElementById('sentence').value.trim();
+
+        if (!sentence) {
+            alert("Bitte gib einen Satz zur Analyse ein.");
+            return;
+        }
+
+        const button = document.getElementById('analyzeBtn');
+        const loading = document.getElementById('loading');
+        const outputContainer = document.getElementById('outputContainer');
+        const resultsDiv = document.getElementById('results');
+
+        button.disabled = true;
+        loading.style.display = 'block';
+        loading.style.color = 'var(--primary-dark)';
+        loading.innerText = "Die linguistische Fakultät wertet aus...";
+        outputContainer.classList.remove('active');
+        resultsDiv.innerHTML = '';
+
+        // Demo Modus falls kein API Key vorhanden
+        if (API_KEY === "DEIN_MISTRAL_API_KEY_HIER" || API_KEY.trim() === "") {
+            setTimeout(() => {
+                loading.style.display = 'none';
+                button.disabled = false;
+                
+                resultsDiv.innerHTML = `
+                    <div class="result-section">
+                        <div class="result-title">Analyse (Demo-Modus)</div>
+                        <p>Du musst erst deinen <strong>Mistral API-Key</strong> oben im JavaScript-Code eintragen, damit die Live-Analyse funktioniert!</p>
+                    </div>
+                `;
+                outputContainer.classList.add('active');
+            }, 1000);
+            return;
+        }
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': "Bearer " + API_KEY
+                },
+                body: JSON.stringify({
+                    model: "mistral-small-latest",
+                    messages: [
+                        { role: "system", content: SYSTEM_PROMPT },
+                        { role: "user", content: `Catégorie demandée : ${category}\nPhrase à analyser : "${sentence}"` }
+                    ],
+                    temperature: 0.3
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error("Server-Antwort nicht OK. Status: " + response.status);
+            }
+
+            const data = await response.json();
+            const textOutput = data.choices[0].message.content;
+
+            // Einfaches Parsen der vordefinierten Blöcke
+            const sections = textOutput.split(/\[(.*?)\]/g).filter(Boolean);
+            
+            let formattedHTML = "";
+            for (let i = 0; i < sections.length; i += 2) {
+                const title = sections[i] ? sections[i].trim() : "";
+                const content = sections[i+1] ? sections[i+1].trim().replace(/\n/g, '<br>') : "";
+                
+                if (title && content) {
+                    if (title.toUpperCase() === "CORRECTION OPTIMISÉE") {
+                        formattedHTML += `
+                            <div class="result-section">
+                                <div class="result-title">Korrektur / Proposition</div>
+                                <div class="correction-box">${content}</div>
+                            </div>
+                        `;
+                    } else {
+                        formattedHTML += `
+                            <div class="result-section">
+                                <div class="result-title">${title === "ANALYSE" ? "Fehler-Diagnose" : "Linguistische Begründung"}</div>
+                                <p>${content}</p>
+                            </div>
+                        `;
+                    }
+                }
+            }
+
+            if (!formattedHTML) {
+                // Fallback, falls die Strukturierung misslang
+                formattedHTML = `<div class="result-section"><p>${textOutput.replace(/\n/g, '<br>')}</p></div>`;
+            }
+
+            resultsDiv.innerHTML = formattedHTML;
+            outputContainer.classList.add('active');
+
+        } catch (error) {
+            loading.style.color = "red";
+            loading.innerText = "Fehler bei der Analyse: " + error.message;
+            console.error(error);
+        } finally {
+            button.disabled = false;
+        }
+    }
+</script>
+
+</body>
+</html>
