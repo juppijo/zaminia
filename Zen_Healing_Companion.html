@@ -231,7 +231,7 @@
     <button class="btn-primary" onclick="sendRequest()">Einsicht erhalten</button>
 
     <div class="chat-response" id="response-area">
-        <em>Hallo! Trage dein Anliegen ein (Stichwörter). Ich verbinde seelische Ursachen mit ganzheitlichen Zen-Impulsen für dich... (Einen Moment bitte.)</em>
+        <em>Hallo! Trage dein Anliegen ein (Stichwörter). Ich verbinde seelische Ursachen mit ganzheitlichen Zen-Impulsen für dich...</em>
     </div>
 </div>
 
@@ -358,7 +358,7 @@ WICHTIGE VERHALTENSREGELN:
             return;
         }
 
-        responseArea.innerHTML = "<em>Ich verbinde mich mit der Seelenebene... ✨</em>";
+        responseArea.innerHTML = "<em>Ich verbinde mich mit der Seelenebene... (Einen Moment bitte.) ✨</em>";
 
         try {
             const res = await fetch(API_URL, {
