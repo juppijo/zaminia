@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zaminia – Ganzheitliche Zen-Heilung</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f4;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --text-color: #2c3e35;
+            --accent-color: #4a7c59;
+            --accent-hover: #3b6346;
+            --border-color: #d1dcd4;
+            --font-family: 'Georgia', serif;
+        }
+
+        body.dark-mode {
+            --bg-color: #1a2421;
+            --card-bg: rgba(28, 38, 34, 0.9);
+            --text-color: #e0e8e3;
+            --accent-color: #6b9e78;
+            --accent-hover: #82b38f;
+            --border-color: #2e4037;
+        }
+
+        body.ocean-mode {
+            --bg-color: #eaf4f4;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text-color: #1b4965;
+            --accent-color: #5bc0be;
+            --accent-hover: #3a86c8;
+            --border-color: #c4e5e5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 650px;
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            font-weight: normal;
+            letter-spacing: 1px;
+        }
+
+        .controls-top {
+            display: flex;
+            gap: 8px;
+        }
+
+        button.icon-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        button.icon-btn:hover {
+            background-color: var(--border-color);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input[type="text"], input[type="password"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.5);
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        body.dark-mode input, body.dark-mode textarea {
+            background: rgba(0,0,0,0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .chat-response {
+            margin-top: 10px;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-color);
+            background: rgba(0,0,0,0.02);
+            min-height: 100px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        /* Modal Settings */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 450px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .theme-select {
+            display: flex;
+            gap: 10px;
+        }
+
+        .theme-opt {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 480px) {
+            .app-container {
+                padding: 16px;
+            }
+            h1 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <h1>🌿 Zaminia Zen Healing</h1>
+        <div class="controls-top">
+            <button class="icon-btn" onclick="toggleFullscreen()" title="Vollbild">⛶</button>
+            <button class="icon-btn" onclick="openSettings()" title="Einstellungen">⚙</button>
+        </div>
+    </header>
+
+    <div class="input-group">
+        <label for="user-symptom">Was beschäftigt dein Wohlbefinden?</label>
+        <input type="text" id="user-symptom" placeholder="z.B. Kopfschmerzen, Allergie, Verspannung..." />
+    </div>
+
+    <button class="btn-primary" onclick="sendRequest()">Einsicht erhalten</button>
+
+    <div class="chat-response" id="response-area">
+        <em>Hallo! Trage dein Anliegen ein. Ich verbinde seelische Ursachen mit ganzheitlichen Zen-Impulsen für dich...</em>
+    </div>
+</div>
+
+<!-- Einstellungen Modal -->
+<div class="modal" id="settings-modal">
+    <div class="modal-content">
+        <h2>Einstellungen</h2>
+        
+        <div class="input-group">
+            <label>Mistral / Le Chat API Key</label>
+            <input type="password" id="api-key" placeholder="Dein API Key..." />
+        </div>
+
+        <div class="input-group">
+            <label>System Prompt (Zaminia Rolle)</label>
+            <textarea id="system-prompt"></textarea>
+        </div>
+
+        <div class="input-group">
+            <label>Farbschema</label>
+            <div class="theme-select">
+                <div class="theme-opt" onclick="setTheme('zen')">Zen Wald</div>
+                <div class="theme-opt" onclick="setTheme('ocean')">Ozean</div>
+                <div class="theme-opt" onclick="setTheme('dark')">Dunkel</div>
+            </div>
+        </div>
+
+        <button class="btn-primary" onclick="closeSettings()">Speichern & Schließen</button>
+    </div>
+</div>
+
+<script>
+    // Configuration de l'API Mistral AI
+    const API_KEY = "DdYXru5rkrACFiEdsuh3jLpqtkeho7jE"; 
+    const API_URL = "https://api.mistral.ai/v1/chat/completions";
+
+    const DEFAULT_PROMPT = "Du bist Zaminia, eine einfühlsame Expertin für ganzheitliche und alternative Heilung sowie die Metaphysik von Symptomen. Deine Antworten sind warmherzig, harmonisch im Zen-Stil gestaltet und vermitteln tiefe Einsichten über emotionale Ursachen sowie sanfte Impulse zur Selbstheilung.";
+
+/*
+    const DEFAULT_PROMPT = `Du bist "Zaminia", eine empathische, weise und erfahrene Expertin für alternative ganzheitliche Heilung, Psychosomatik und energetische Körperarbeit. Deine Aufgabe ist es, dem Nutzer zu helfen, die Botschaften seines Körpers zu verstehen und ganzheitliche Wege zur Heilung aufzuzeigen.
+
+Sobald der Nutzer einen Körperbereich, ein Symptom oder ein Organ eingibt, analysierst du diesen Input und antwortest AUSSCHLIESSLICH in den folgenden 4 klar strukturierten Abschnitten:
+
+---
+
+## 🧘‍♀️ 1. Psychosomatische Bedeutung & Seelischer Konflikt
+- Erkläre die symbolische und emotionale Bedeutung dieser Körperregion.
+- Welche verdrängten Gefühle, Stressfaktoren, Ängste oder Glaubenssätze spiegeln sich häufig in diesem Bereich wider? (Analysiere Themen wie z. B. Loslassen, Selbstwert, Grenzen setzen, Lebensfluss oder unverarbeitete Emotionen).
+
+## 💡 2. Die Botschaft deines Körpers (Reflexionsfragen)
+- Formuliere 2 bis 3 feinfühlige, tiefgründige Fragen, die dem Nutzer helfen, in sich hineinzuhorchen und den aktuellen Lebensbezug zum Symptom zu erkennen.
+
+## 🌿 3. Alternative & Ganzheitliche Heilungsmethoden
+Biete einen ganzheitlichen Werkzeugkasten mit konkreten Empfehlungen aus folgenden Bereichen an:
+- **Energetisch & Geistig:** (z. B. Affirmationen, Visualisierungen, Atemübungen, Meditationen)
+- **Körperlich & Naturheilkundlich:** (z. B. Akupressurpunkte, ätherische Öle, Kräuter, SANFTE Bewegungsformen wie Yoga oder Tai-Chi)
+- **Emotional:** (z. B. Journaling-Impulsen, Ritualen zum Loslassen)
+
+## ✨ 4. Zaminias Impuls für den Tag
+- Ein kurzer, liebevoller und aufmunternder Abschlussgedanke oder eine kraftvolle Affirmation, die der Nutzer sofort verinnerlichen kann.
+
+---
+
+WICHTIGE VERHALTENSREGELN:
+- Tone of Voice: Empathisch, warmherzig, tiefgründig, ermutigend und frei von Bewertung.
+- Verwende eine visuell ansprechende Formatierung mit Markdown (Überschriften, Stichpunkte, Fettdruck), damit die Antwort leicht scannbar und gut lesbar ist.
+- HINWEIS: Füge am Ende JEDER Antwort dezent diesen medizinischen Haftungsausschluss hinzu: 
+  *Hinweis: Diese psychosomatischen Impulse ersetzen keinen Arzt oder Heilpraktiker, sondern dienen als ganzheitliche Ergänzung zur Aktivierung deiner Selbstheilungskräfte.*`;
+*/
+
+    // Load stored settings
+    document.addEventListener("DOMContentLoaded", () => {
+        // Falls kein Key im localStorage liegt, nimm den oben definierten API_KEY
+        const storedKey = localStorage.getItem('zen_api_key') || API_KEY;
+        document.getElementById('api-key').value = storedKey;
+        
+        document.getElementById('system-prompt').value = localStorage.getItem('zen_system_prompt') || DEFAULT_PROMPT;
+        const currentTheme = localStorage.getItem('zen_theme') || 'zen';
+        setTheme(currentTheme);
+    });
+
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => console.log(err));
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    }
+
+    function openSettings() {
+        document.getElementById('settings-modal').style.display = 'flex';
+    }
+
+    function closeSettings() {
+        localStorage.setItem('zen_api_key', document.getElementById('api-key').value);
+        localStorage.setItem('zen_system_prompt', document.getElementById('system-prompt').value);
+        document.getElementById('settings-modal').style.display = 'none';
+    }
+
+    function setTheme(theme) {
+        document.body.classList.remove('dark-mode', 'ocean-mode');
+        if (theme === 'dark') document.body.classList.add('dark-mode');
+        if (theme === 'ocean') document.body.classList.add('ocean-mode');
+        localStorage.setItem('zen_theme', theme);
+    }
+
+    async function sendRequest() {
+        // Falls im localStorage nichts steht, greife auf die Konstante API_KEY zurück
+        const apiKey = localStorage.getItem('zen_api_key') || API_KEY;
+        const systemPrompt = localStorage.getItem('zen_system_prompt') || DEFAULT_PROMPT;
+        const userSymptom = document.getElementById('user-symptom').value.trim();
+        const responseArea = document.getElementById('response-area');
+
+        if (!userSymptom) {
+            responseArea.innerHTML = "<em>Bitte trage zuerst ein Symptom oder ein Anliegen ein.</em>";
+            return;
+        }
+
+        if (!apiKey) {
+            responseArea.innerHTML = "<em>Bitte trage in den Einstellungen (⚙) deinen Mistral API-Key ein.</em>";
+            openSettings();
+            return;
+        }
+
+        responseArea.innerHTML = "<em>Ich verbinde mich mit der Seelenebene... ✨</em>";
+
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: 'mistral-small-latest', // Aktualisiertes Modell für zuverlässige Antworten
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: `Bitte gib mir eine ganzheitliche Betrachtung zu folgendem Thema/Symptom: ${userSymptom}` }
+                    ]
+                })
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(`API Fehler: ${res.status} ${errorData.message || ''}`);
+            }
+
+            const data = await res.json();
+            const reply = data.choices[0].message.content;
+            responseArea.innerText = reply;
+
+        } catch (err) {
+            responseArea.innerHTML = `<span style="color:red;">Fehler beim Abrufen der Antwort: ${err.message}</span>`;
+        }
+    }
+</script>
+
+</body>
+</html>
