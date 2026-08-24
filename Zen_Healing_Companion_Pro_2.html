@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ganzheitliche Zen-Heilung Pro Vers. 2.0</title>
+    <title>Virtueller Naturcoach Pro</title>
     <style>
         :root {
             --bg-color: #f4f6f4;
@@ -80,13 +80,6 @@
             letter-spacing: 1px;
         }
 
-        h2 {
-            font-size: 1.2rem;
-            font-weight: normal;
-            font-style: italic;
-            letter-spacing: 1px;
-        }
-
         .controls-top {
             display: flex;
             gap: 8px;
@@ -140,7 +133,7 @@
 
         textarea {
             resize: vertical;
-            min-height: 300px;
+            min-height: 250px;
             height: auto;
         }
 
@@ -167,7 +160,7 @@
         .chat-response {
             margin-top: 10px;
             padding: 16px;
-            padding-top: 40px; /* Platz für den Vorlese-Button */
+            padding-top: 40px;
             border-radius: 8px;
             border-left: 3px solid var(--accent-color);
             background: rgba(0,0,0,0.02);
@@ -187,7 +180,7 @@
             padding: 4px 12px;
             font-size: 0.8rem;
             cursor: pointer;
-            display: none; /* Erst anzeigen, wenn Text vorhanden ist */
+            display: none;
             align-items: center;
             gap: 5px;
         }
@@ -196,7 +189,6 @@
             background-color: var(--accent-hover);
         }
 
-        /* Modal Settings */
         .modal {
             display: none;
             position: fixed;
@@ -249,8 +241,7 @@
 
 <div class="app-container">
     <header>
-        <h1>🌿 Zen Healing Pro</h2>  
-            <h2> Vers. 2.0 </h2>
+        <h1>🍃 Virtueller Naturcoach</h1>  
         <div class="controls-top">
             <button class="icon-btn" onclick="toggleFullscreen()" title="Vollbild">⛶</button>
             <button class="icon-btn" onclick="openSettings()" title="Einstellungen">⚙</button>
@@ -258,16 +249,16 @@
     </header>
 
     <div class="input-group">
-        <label for="user-symptom">Was beschäftigt dein Wohlbefinden?</label>
-        <input type="text" id="user-symptom" placeholder="z.B. Kopfschmerzen, Allergie, Verspannung..." />
+        <label for="user-prompt">Was möchtest du in den Wald tragen?</label>
+        <input type="text" id="user-prompt" placeholder="z. B. Ich stehe vor einer schweren Entscheidung..." />
     </div>
 
-    <button class="btn-primary" onclick="sendRequest()">Einsicht erhalten</button>
+    <button class="btn-primary" onclick="sendRequest()">Impuls empfangen</button>
 
     <div class="response-wrapper">
         <button id="tts-btn" class="audio-btn" onclick="toggleSpeech()">🔊 Vorlesen</button>
         <div class="chat-response" id="response-area">
-            <em>Hallo! Trage dein Anliegen ein (Stichwörter). Ich verbinde seelische Ursachen mit ganzheitlichen Zen-Impulsen für dich...</em>
+            <em>Willkommen im virtuellen Wald. Trage deine Frage oder dein Thema oben ein und nimm dir einen Moment Zeit zum Durchatmen...</em>
         </div>
     </div>
 </div>
@@ -283,14 +274,14 @@
         </div>
 
         <div class="input-group">
-            <label>System Prompt (Zaminia Rolle)</label>
+            <label>System Prompt (Naturcoach Rolle)</label>
             <textarea id="system-prompt"></textarea>
         </div>
 
         <div class="input-group">
             <label>Farbschema</label>
             <div class="theme-select">
-                <div class="theme-opt" onclick="setTheme('zen')">Zen Wald</div>
+                <div class="theme-opt" onclick="setTheme('zen')">Wald & Wiese</div>
                 <div class="theme-opt" onclick="setTheme('ocean')">Ozean</div>
                 <div class="theme-opt" onclick="setTheme('dark')">Dunkel</div>
             </div>
@@ -304,69 +295,26 @@
     const API_KEY = "DdYXru5rkrACFiEdsuh3jLpqtkeho7jE"; 
     const API_URL = "https://api.mistral.ai/v1/chat/completions";
 
-/*
-    const DEFAULT_PROMPT = `Du bist "Zaminia", eine empathische, weise und erfahrene Expertin für alternative ganzheitliche Heilung, Psychosomatik und energetische Körperarbeit. Deine Aufgabe ist es, dem Nutzer zu helfen, die Botschaften seines Körpers zu verstehen und ganzheitliche Wege zur Heilung aufzuzeigen.
+    const DEFAULT_PROMPT = `Du agierst ab sofort als erfahrener, empathischer und naturverbundener Natur-Coach. Deine Aufgabe ist es, mich bei meinen Fragen, Herausforderungen oder persönlichen Themen mithilfe von Methoden des Naturcoachings zu begleiten.
 
-Sobald der Nutzer einen Körperbereich, ein Symptom oder ein Organ eingibt, analysierst du diesen Input und antwortest AUSSCHLIESSLICH in den folgenden 4 klar strukturierten Abschnitten:
+Beachte dabei folgende Prinzipien:
+1. Haltung & Tonalität: Sprich ruhig, wertschätzend, entschleunigend und achtsam. Gib mir Raum zum Nachdenken und frage aufmerksam nach.
+2. Einbinden der Natur: Nutze Metaphern, Bilder und Symboliken aus der Pflanzen- und Tierwelt, den Jahreszeiten oder Naturelementen (Wasser, Erde, Wind, Feuer/Licht), um mir neue Perspektiven zu eröffnen.
+3. Interaktive Übungen: Schlage mir konkrete, praxisnahe Übungen für draußen vor (z. B. Schwellengänge, Achtsamkeitsimpulse, Perspektivwechsel oder Arbeit mit Fundstücken), wenn es zu meiner Situation passt.
+4. Strukturierter Ablauf: 
+   - Höre mir zuerst aufmerksam zu und fasse mein Anliegen kurz zusammen.
+   - Stelle mir 1-2 gezielte, reflektierende Fragen.
+   - Biete mir ein passendes Naturbild oder einen Impuls für draußen an.
+   - Beende deine Nachricht stets mit einer einzelnen, klaren Frage zur Weiterarbeit.
 
-## 🧘‍♀️ 1. Psychosomatische Bedeutung & Seelischer Konflikt
-- Erkläre die symbolische und emotionale Bedeutung dieser Körperregion.
-- Welche verdrängten Gefühle, Stressfaktoren, Ängste oder Glaubenssätze spiegeln sich häufig in diesem Bereich wider? (Analysiere Themen wie z. B. Loslassen, Selbstwert, Grenzen setzen, Lebensfluss oder unverarbeitete Emotionen).
+Wenn du bereit bist, wünsche mir einen ruhigen Empfang und frage mich, welches Thema oder welche Frage ich heute mit in den "virtuellen Wald" bringen möchte.`;
 
-## 💡 2. Die Botschaft deines Körpers (Reflexionsfragen)
-- Formuliere 2 bis 3 feinfühlige, tiefgründige Fragen, die dem Nutzer helfen, in sich hineinzuhorchen und den aktuellen Lebensbezug zum Symptom zu erkennen.
-
-## 🌿 3. Alternative & Ganzheitliche Heilungsmethoden
-Biete einen ganzheitlichen Werkzeugkasten mit konkreten Empfehlungen aus folgenden Bereichen an:
-- **Energetisch & Geistig:** (z. B. Affirmationen, Visualisierungen, Atemübungen, Meditationen)
-- **Körperlich & Naturheilkundlich:** (z. B. Akupressurpunkte, ätherische Öle, Kräuter, SANFTE Bewegungsformen wie Yoga oder Tai-Chi)
-- **Emotional:** (z. B. Journaling-Impulsen, Ritualen zum Loslassen)
-
-## ✨ 4. Zaminias Impuls für den Tag
-- Ein kurzer, liebevoller und aufmunternder Abschlussgedanke oder eine kraftvolle Affirmation, die der Nutzer sofort verinnerlichen kann.
-
-WICHTIGE VERHALTENSREGELN:
-- Tone of Voice: Empathisch, warmherzig, tiefgründig, ermutigend und frei von Bewertung.
-- Verwende eine visuell ansprechende Formatierung mit Markdown (Überschriften, Stichpunkte, Fettdruck), damit die Antwort leicht scannbar und gut lesbar ist.
-- HINWEIS: Füge am Ende JEDER Antwort dezent diesen medizinischen Haftungsausschluss hinzu: 
-  *Hinweis: Diese psychosomatischen Impulse ersetzen keinen Arzt oder Heilpraktiker, sondern dienen als ganzheitliche Ergänzung zur Aktivierung deiner Selbstheilungskräfte.*`;
-
-*/
-
-const DEFAULT_PROMPT = `Du bist Zaminia, eine 21-jährige Kunststudentin aus Paris und Expertin für alternatives, ganzheitliches Heilen sowie die psychosomatischen Ursachen von Krankheiten (basierend auf der Metaphysik der Beschwerden). Du begegnest dem Nutzer stets liebevoll, einfühlsam, verständnisvoll und auf Augenhöhe.
-
-Deine Aufgabe ist es, den Nutzer bei seinen körperlichen oder emotionalen Beschwerden ganzheitlich zu begleiten. Nutze dazu das folgende strukturierte Vorgehen:
-
-1. **Metaphysische & Emotionale Analyse:**
-   - Welches Organ oder welche Körperregion ist betroffen?
-   - Welche ungelösten Emotionen, Konflikte, Ängste oder Glaubenssätze (z. B. nach Jacques Martel) können dahinterstecken?
-   - Erkläre die symbolische Botschaft des Körpers in einer klaren, bildhaften und tiefgründigen Sprache.
-
-2. **Ganzheitliche Impulse & Übungen:**
-   - Biete sanfte energetische oder Achtsamkeitsübungen an (z. B. Herz-Zentrierung, Atemübungen, Visualisierungen im impressionistischen/künstlerischen Stil).
-   - Fahre fort mit einer Methode zur emotionalen Integration (z. B. Vergebungsarbeit, Raumgeben für angestaute Gefühle).
-   - Gib Tipps: Körperlich & Naturheilkundlich (z. B. Akupressurpunkte, ätherische Öle, Kräuter, SANFTE Bewegungsformen wie Yoga oder Tai-Chi).
-
-3. **Fragen als Afformationen (mit o ) nach Noah St. John, also Fragen mit "Warum...":**
-    Bitte erstelle mir dazu folgendes:
-    3 individuelle Fragen als "Afformationen", die genau auf mein Thema zugeschnitten sind.
-    Anforderung an die Afformationen:
-    - Sie MÜSSEN als Positivfragen formuliert sein, die mit "Warum..." beginnen (z. B. „Warum öffne ich mein Herz jeden Tag ein Stückchen mehr für meine Heilung?“ oder z. B. „Warum fühle ich mich von Tag zu Tag sicherer und geborgener in meinem Körper?“ oder z.B. „Warum fällt es mir so leicht, alte Spannungen jetzt loszulassen?“).
-    - Sie müssen das Unterbewusstsein auf eine positive Lösung ausrichten (Afformation!).
-
-4. **Sanfter Abschluss & Gesprächsöffnung:**
-   - Schließe mit einer liebevollen Ermutigung ab.
-
-5. Füge am Ende JEDER Antwort dezent diesen medizinischen Haftungsausschluss hinzu: 
-  *Hinweis: Diese psychosomatischen Impulse ersetzen keinen Arzt oder Heilpraktiker, sondern dienen als ganzheitliche Ergänzung zur Aktivierung deiner Selbstheilungskräfte.*`;
-
-    // Load stored settings
     document.addEventListener("DOMContentLoaded", () => {
-        const storedKey = localStorage.getItem('zen_api_key') || API_KEY;
+        const storedKey = localStorage.getItem('natur_api_key') || API_KEY;
         document.getElementById('api-key').value = storedKey;
         
-        document.getElementById('system-prompt').value = localStorage.getItem('zen_system_prompt') || DEFAULT_PROMPT;
-        const currentTheme = localStorage.getItem('zen_theme') || 'zen';
+        document.getElementById('system-prompt').value = localStorage.getItem('natur_system_prompt') || DEFAULT_PROMPT;
+        const currentTheme = localStorage.getItem('natur_theme') || 'zen';
         setTheme(currentTheme);
     });
 
@@ -385,8 +333,8 @@ Deine Aufgabe ist es, den Nutzer bei seinen körperlichen oder emotionalen Besch
     }
 
     function closeSettings() {
-        localStorage.setItem('zen_api_key', document.getElementById('api-key').value);
-        localStorage.setItem('zen_system_prompt', document.getElementById('system-prompt').value);
+        localStorage.setItem('natur_api_key', document.getElementById('api-key').value);
+        localStorage.setItem('natur_system_prompt', document.getElementById('system-prompt').value);
         document.getElementById('settings-modal').style.display = 'none';
     }
 
@@ -394,14 +342,25 @@ Deine Aufgabe ist es, den Nutzer bei seinen körperlichen oder emotionalen Besch
         document.body.classList.remove('dark-mode', 'ocean-mode');
         if (theme === 'dark') document.body.classList.add('dark-mode');
         if (theme === 'ocean') document.body.classList.add('ocean-mode');
-        localStorage.setItem('zen_theme', theme);
+        localStorage.setItem('natur_theme', theme);
     }
 
-    /* --- Vorlesefunktion (Text-to-Speech) --- */
     let isSpeaking = false;
+
+    // Stimmen werden in manchen Browsern asynchron geladen
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = () => {
+            window.speechSynthesis.getVoices();
+        };
+    }
 
     function toggleSpeech() {
         const ttsBtn = document.getElementById('tts-btn');
+
+        if (!('speechSynthesis' in window)) {
+            alert('Ihr Browser unterstützt keine Vorlesefunktion.');
+            return;
+        }
         
         if (isSpeaking) {
             window.speechSynthesis.cancel();
@@ -411,21 +370,29 @@ Deine Aufgabe ist es, den Nutzer bei seinen körperlichen oder emotionalen Besch
         }
 
         const rawText = document.getElementById('response-area').innerText;
-        // Bereinige Markdown-Zeichen (*, #, etc.), damit sie nicht mitgelesen werden
         const cleanText = rawText.replace(/[*#_`]/g, '');
 
         if (!cleanText) return;
 
         const utterance = new SpeechSynthesisUtterance(cleanText);
         utterance.lang = 'de-DE';
-        utterance.rate = 0.95; // Etwas langsamer für sanftere Zen-Stimmung
+        utterance.rate = 0.9; 
 
-        // Versuche eine ruhige deutsche Stimme auszuwählen
-        const voices = window.speechSynthesis.getVoices();
-        const deVoice = voices.find(v => v.lang.includes('de'));
-        if (deVoice) utterance.voice = deVoice;
+        // Natürliche deutsche Stimme bevorzugen (Google, Microsoft Natural, etc.)
+        const stimmen = window.speechSynthesis.getVoices();
+        const deutscheStimme = stimmen.find(s => s.lang.includes('de') && (s.name.includes('Natural') || s.name.includes('Google') || s.name.includes('Online'))) 
+                               || stimmen.find(s => s.lang.includes('de'));
+        
+        if (deutscheStimme) {
+            utterance.voice = deutscheStimme;
+        }
 
         utterance.onend = () => {
+            isSpeaking = false;
+            ttsBtn.innerText = "🔊 Vorlesen";
+        };
+
+        utterance.onerror = () => {
             isSpeaking = false;
             ttsBtn.innerText = "🔊 Vorlesen";
         };
@@ -436,13 +403,12 @@ Deine Aufgabe ist es, den Nutzer bei seinen körperlichen oder emotionalen Besch
     }
 
     async function sendRequest() {
-        const apiKey = localStorage.getItem('zen_api_key') || API_KEY;
-        const systemPrompt = localStorage.getItem('zen_system_prompt') || DEFAULT_PROMPT;
-        const userSymptom = document.getElementById('user-symptom').value.trim();
+        const apiKey = localStorage.getItem('natur_api_key') || API_KEY;
+        const systemPrompt = localStorage.getItem('natur_system_prompt') || DEFAULT_PROMPT;
+        const userPrompt = document.getElementById('user-prompt').value.trim();
         const responseArea = document.getElementById('response-area');
         const ttsBtn = document.getElementById('tts-btn');
 
-        // Falls noch eine Sprache läuft, beenden
         if (isSpeaking) {
             window.speechSynthesis.cancel();
             isSpeaking = false;
@@ -450,18 +416,18 @@ Deine Aufgabe ist es, den Nutzer bei seinen körperlichen oder emotionalen Besch
         }
         ttsBtn.style.display = 'none';
 
-        if (!userSymptom) {
-            responseArea.innerHTML = "<em>Bitte trage zuerst ein Symptom oder ein Anliegen ein.</em>";
+        if (!userPrompt) {
+            responseArea.innerHTML = "<em>Bitte schenke dem Feld eine kurze Notiz oder eine Frage.</em>";
             return;
         }
 
         if (!apiKey) {
-            responseArea.innerHTML = "<em>Bitte trage in den Einstellungen (⚙) deinen Mistral API-Key ein.</em>";
+            responseArea.innerHTML = "<em>Bitte hinterlege in den Einstellungen (⚙) deinen API-Key.</em>";
             openSettings();
             return;
         }
 
-        responseArea.innerHTML = "<em>Ich verbinde mich mit der Seelenebene... (Einen Moment bitte.) ✨</em>";
+        responseArea.innerHTML = "<em>Ich trete für dich in den Wald ein... (Einen Moment bitte.) 🌿</em>";
 
         try {
             const res = await fetch(API_URL, {
@@ -474,25 +440,24 @@ Deine Aufgabe ist es, den Nutzer bei seinen körperlichen oder emotionalen Besch
                     model: 'mistral-small-latest',
                     messages: [
                         { role: 'system', content: systemPrompt },
-                        { role: 'user', content: `Bitte gib mir eine ganzheitliche Betrachtung zu folgendem Thema/Symptom: ${userSymptom}` }
+                        { role: 'user', content: userPrompt }
                     ]
                 })
             });
 
             if (!res.ok) {
                 const errorData = await res.json().catch(() => ({}));
-                throw new Error(`API Fehler: ${res.status}${errorData.message || ''}`);
+                throw new Error(`API Fehler: ${res.status} ${errorData.message || ''}`);
             }
 
             const data = await res.json();
             const reply = data.choices[0].message.content;
             responseArea.innerText = reply;
             
-            // Button zum Vorlesen einblenden, sobald die Antwort da ist
             ttsBtn.style.display = 'flex';
 
         } catch (err) {
-            responseArea.innerHTML = `<span style="color:red;">Fehler beim Abrufen der Antwort: ${err.message}</span>`;
+            responseArea.innerHTML = `<span style="color:red;">Fehler beim Empfangen des Impulses: ${err.message}</span>`;
         }
     }
 </script>
