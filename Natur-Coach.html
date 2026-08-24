@@ -347,8 +347,20 @@ Wenn du bereit bist, wünsche mir einen ruhigen Empfang und frage mich, welches 
 
     let isSpeaking = false;
 
+    // Stimmen werden in manchen Browsern asynchron geladen
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = () => {
+            window.speechSynthesis.getVoices();
+        };
+    }
+
     function toggleSpeech() {
         const ttsBtn = document.getElementById('tts-btn');
+
+        if (!('speechSynthesis' in window)) {
+            alert('Ihr Browser unterstützt keine Vorlesefunktion.');
+            return;
+        }
         
         if (isSpeaking) {
             window.speechSynthesis.cancel();
@@ -366,11 +378,21 @@ Wenn du bereit bist, wünsche mir einen ruhigen Empfang und frage mich, welches 
         utterance.lang = 'de-DE';
         utterance.rate = 0.9; 
 
-        const voices = window.speechSynthesis.getVoices();
-        const deVoice = voices.find(v => v.lang.includes('de'));
-        if (deVoice) utterance.voice = deVoice;
+        // Natürliche deutsche Stimme bevorzugen (Google, Microsoft Natural, etc.)
+        const stimmen = window.speechSynthesis.getVoices();
+        const deutscheStimme = stimmen.find(s => s.lang.includes('de') && (s.name.includes('Natural') || s.name.includes('Google') || s.name.includes('Online'))) 
+                               || stimmen.find(s => s.lang.includes('de'));
+        
+        if (deutscheStimme) {
+            utterance.voice = deutscheStimme;
+        }
 
         utterance.onend = () => {
+            isSpeaking = false;
+            ttsBtn.innerText = "🔊 Vorlesen";
+        };
+
+        utterance.onerror = () => {
             isSpeaking = false;
             ttsBtn.innerText = "🔊 Vorlesen";
         };
