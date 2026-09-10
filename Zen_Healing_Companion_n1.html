@@ -270,13 +270,21 @@
 <script>
     // OpenRouter API Configuration
     const API_URL = "https://openrouter.ai/api/v1/chat/completions";
-    const DEFAULT_MODEL = "mistralai/mistral-7b-instruct:free";
+
+    // Liste von kostenlosen Backup-Modellen (werden der Reihe nach probiert)
+    const FREE_MODELS = [
+        "google/gemini-2.0-flash-exp:free",
+        "meta-llama/llama-3.3-70b-instruct:free",
+        "qwen/qwen-2.5-72b-instruct:free",
+        "mistralai/mistral-small-24b-instruct-2501:free",
+        "deepseek/deepseek-r1:free"
+    ];
 
     const DEFAULT_PROMPT = "Du bist Zaminia, eine einfühlsame Expertin für ganzheitliche und alternative Heilung sowie die Metaphysik von Symptomen. Deine Antworten sind warmherzig, harmonisch im Zen-Stil gestaltet und vermitteln tiefe Einsichten über emotionale Ursachen sowie sanfte Impulse zur Selbstheilung.";
 
     document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('api-key').value = localStorage.getItem('openrouter_api_key') || '';
-        document.getElementById('model-name').value = localStorage.getItem('openrouter_model') || DEFAULT_MODEL;
+        document.getElementById('model-name').value = localStorage.getItem('openrouter_model') || FREE_MODELS[0];
         document.getElementById('system-prompt').value = localStorage.getItem('zen_system_prompt') || DEFAULT_PROMPT;
         
         const currentTheme = localStorage.getItem('zen_theme') || 'zen';
@@ -299,7 +307,7 @@
 
     function closeSettings() {
         localStorage.setItem('openrouter_api_key', document.getElementById('api-key').value.trim());
-        localStorage.setItem('openrouter_model', document.getElementById('model-name').value.trim() || DEFAULT_MODEL);
+        localStorage.setItem('openrouter_model', document.getElementById('model-name').value.trim() || FREE_MODELS[0]);
         localStorage.setItem('zen_system_prompt', document.getElementById('system-prompt').value.trim());
         document.getElementById('settings-modal').style.display = 'none';
     }
@@ -313,7 +321,7 @@
 
     async function sendRequest() {
         const apiKey = localStorage.getItem('openrouter_api_key');
-        const selectedModel = localStorage.getItem('openrouter_model') || DEFAULT_MODEL;
+        const userModel = localStorage.getItem('openrouter_model');
         const systemPrompt = localStorage.getItem('zen_system_prompt') || DEFAULT_PROMPT;
         const userSymptom = document.getElementById('user-symptom').value.trim();
         const responseArea = document.getElementById('response-area');
@@ -329,38 +337,50 @@
             return;
         }
 
-        responseArea.innerHTML = "<em>Ich verbinde mich mit der Seelenebene... (Einen Moment bitte.) ✨</em>";
+        responseArea.innerHTML = "<em>Verbinde mit OpenRouter... ✨</em>";
 
-        try {
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`,
-                    'HTTP-Referer': window.location.href,
-                    'X-Title': 'Zaminia Zen Healing'
-                },
-                body: JSON.stringify({
-                    model: selectedModel,
-                    messages: [
-                        { role: 'system', content: systemPrompt },
-                        { role: 'user', content: `Bitte gib mir eine ganzheitliche Betrachtung zu folgendem Thema/Symptom: ${userSymptom}` }
-                    ]
-                })
-            });
+        // Prioritätsliste erstellen: Erst das eingestellte Modell, dann die Fallbacks
+        let modelsToTry = [userModel, ...FREE_MODELS].filter((v, i, a) => v && a.indexOf(v) === i);
 
-            if (!res.ok) {
-                const errorData = await res.json().catch(() => ({}));
-                throw new Error(`API Fehler: ${res.status} ${errorData.error?.message || errorData.message || ''}`);
+        for (let i = 0; i < modelsToTry.length; i++) {
+            const currentModel = modelsToTry[i];
+            responseArea.innerHTML = `<em>Versuche Modell (${i + 1}/${modelsToTry.length}): ${currentModel}... ✨</em>`;
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`,
+                        'HTTP-Referer': window.location.href,
+                        'X-Title': 'Zaminia Zen Healing'
+                    },
+                    body: JSON.stringify({
+                        model: currentModel,
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: `Bitte gib mir eine ganzheitliche Betrachtung zu folgendem Thema/Symptom: ${userSymptom}` }
+                        ]
+                    })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    const reply = data.choices[0].message.content;
+                    responseArea.innerText = reply;
+                    return; // Erfolgreich! Funktionsaufruf beenden.
+                }
+
+                // Falls 404 oder ein anderer Fehler auftritt, im Loop weitermachen mit nächstem Modell
+                console.warn(`Modell ${currentModel} fehlgeschlagen (Status ${res.status}). Versuche nächstes...`);
+
+            } catch (err) {
+                console.warn(`Netzwerkfehler bei Modell ${currentModel}:`, err);
             }
-
-            const data = await res.json();
-            const reply = data.choices[0].message.content;
-            responseArea.innerText = reply;
-
-        } catch (err) {
-            responseArea.innerHTML = `<span style="color:red;">Fehler beim Abrufen der Antwort: ${err.message}</span>`;
         }
+
+        // Falls alle Modelle fehlschlagen:
+        responseArea.innerHTML = `<span style="color:red;">Keines der kostenlosen Modelle war erreichbar. Bitte überprüfe deinen API-Key in den Einstellungen (⚙).</span>`;
     }
 </script>
 
