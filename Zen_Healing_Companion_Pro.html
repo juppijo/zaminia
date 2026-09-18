@@ -368,7 +368,8 @@ WICHTIGE VERHALTENSREGELN:
                     'Authorization': `Bearer ${apiKey}`
                 },
                 body: JSON.stringify({
-                    model: 'mistral-small-latest', // Aktualisiertes Modell für zuverlässige Antworten
+                    //model: 'mistral-small-latest', // Aktualisiertes Modell für zuverlässige Antworten
+                  	model: 'mistral-tiny-latest',
                     messages: [
                         { role: 'system', content: systemPrompt },
                         { role: 'user', content: `Bitte gib mir eine ganzheitliche Betrachtung zu folgendem Thema/Symptom: ${userSymptom}` }
@@ -386,8 +387,16 @@ WICHTIGE VERHALTENSREGELN:
             responseArea.innerText = reply;
 
         } catch (err) {
-            responseArea.innerHTML = `<span style="color:red;">Fehler beim Abrufen der Antwort: ${err.message}</span>`;
+        if (err.message.includes("429")) {
+          responseArea.innerHTML = `
+            <span style="color: orange;">
+                ⏳ Rate-Limit erreicht! Bitte warte einen Moment und versuche es erneut.
+            </span>
+        `;
+        } else {
+          responseArea.innerHTML = `<span style="color: red;">Fehler: ${err.message}</span>`;
         }
+      }
     }
 </script>
 

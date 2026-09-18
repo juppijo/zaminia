@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stylistique Française - Interaktiver Trainer</title>
+    <title>Stil-Trainer – Französisch</title>
     <style>
         :root {
-            --primary: #00a8b5; /* Dein charakteristisches Blau-Türkis */
+            --primary: #00a8b5;
             --primary-dark: #008894;
             --primary-light: #e6f7f8;
             --bg: #f4f9f9;
@@ -14,6 +14,9 @@
             --card-bg: #ffffff;
             --border: #d1e9ea;
             --accent-orange: #ff7e67;
+            --error: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
         }
 
         * {
@@ -31,6 +34,7 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            line-height: 1.6;
         }
 
         .container {
@@ -84,7 +88,7 @@
 
         textarea {
             resize: vertical;
-            min-height: 80px;
+            min-height: 100px;
             font-family: 'Courier New', Courier, monospace;
         }
 
@@ -139,12 +143,37 @@
             transform: scale(0.98);
         }
 
+        button.action-btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+
         .loading {
             display: none;
             text-align: center;
             color: var(--primary-dark);
             font-weight: 600;
             margin: 20px 0;
+        }
+
+        .status-message {
+            text-align: center;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .status-error {
+            background-color: #fdecea;
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+
+        .status-success {
+            background-color: #e8f8f0;
+            color: var(--success);
+            border: 1px solid var(--success);
         }
 
         .output-container {
@@ -190,15 +219,56 @@
             margin-top: 10px;
             color: #14532d;
         }
+
+        .api-key-info {
+            background-color: #fff8e1;
+            border: 1px solid #ffc107;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #8d6e63;
+        }
+
+        .api-key-info a {
+            color: var(--primary-dark);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .api-key-info a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .preset-btn {
+                font-size: 0.75rem;
+                padding: 4px 8px;
+            }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>Analyseur de Style & Syntaxe</h1>
-        <p class="subtitle">Linguistisches Analyse-Tool für exzellentes Französisch</p>
+        <h1>Stil-Trainer – Französisch</h1>
+        <p class="subtitle">Interaktives Tool zur Analyse von Stil und Syntax im Französischen</p>
     </header>
+
+    <div class="api-key-info" id="apiKeyInfo">
+        <strong>Hinweis:</strong> Diese Demo verwendet einen lokalen API-Key. 
+        Für die echte Nutzung ersetze <code>API_KEY</code> im JavaScript-Code mit deinem 
+        <a href="https://console.mistral.ai/" target="_blank">Mistral API-Key</a>.
+    </div>
 
     <div class="form-group">
         <label for="category">Fehlerkategorie wählen:</label>
@@ -214,37 +284,52 @@
     </div>
 
     <div class="form-group">
-        <label>Musterbeispiele aus deinen Übungen (Klick zum Laden):</label>
+        <label>Musterbeispiele (Klick zum Laden):</label>
         <div class="preset-container" id="presets">
-            <!-- Dynamische Presets landen hier -->
+            <!-- Dynamische Presets werden hier eingefügt -->
         </div>
     </div>
 
     <div class="form-group">
         <label for="sentence">Zu analysierender französischer Satz:</label>
-        <textarea id="sentence" placeholder="Satz hier eingeben oder oben ein Beispiel wählen..."></textarea>
+        <textarea 
+            id="sentence" 
+            placeholder="Gib hier deinen französischen Satz ein oder wähle ein Beispiel aus den Presets..."
+            aria-label="Französischen Satz zur stilistischen Analyse eingeben"
+        ></textarea>
     </div>
 
-    <button class="action-btn" id="analyzeBtn" onclick="analyzeSentence()">Satz linguistisch analysieren</button>
+    <button 
+        class="action-btn" 
+        id="analyzeBtn" 
+        onclick="analyzeSentence()"
+        aria-label="Satz analysieren"
+    >
+        Satz analysieren
+    </button>
 
-    <div class="loading" id="loading">Analysiere Stilistik und syntaktische Strukturen...</div>
+    <div class="loading" id="loading" aria-live="polite">
+        Analysiere Stilistik und syntaktische Strukturen...
+    </div>
+
+    <div class="status-message" id="statusMessage" aria-live="polite"></div>
 
     <div class="output-container" id="outputContainer">
-        <h2>Expertise-Bericht (Rapport d'analyse):</h2>
+        <h2>Analyseergebnis:</h2>
         <div id="results">
-            <!-- Hier landet die strukturierte Auswertung -->
+            <!-- Hier wird die Analyse angezeigt -->
         </div>
     </div>
 </div>
 
 <script>
-    // Setze hier deinen funktionierenden Mistral API Key ein
-    //const API_KEY = "DEIN_MISTRAL_API_KEY_HIER"; 
-
-    const API_KEY = "DdYXru5rkrACFiEdsuh3jLpqtkeho7jE"; 
+    // === Konfiguration === 
+    // Ersetze diesen Key mit deinem echten Mistral API-Key
+    // Siehe: https://console.mistral.ai/
+    const API_KEY = "TiIaORmMxnFunIhOgZK40MwRpbY1Ud9u"; // Leer lassen für Demo-Modus
     const API_URL = "https://api.mistral.ai/v1/chat/completions";
 
-    // Presets direkt aus deinen hochgeladenen Dokumenten
+    // === Presets (Beispieldaten) === 
     const PRESETS = {
         solecisme: [
             "Après avoir frôlé la mort, les journées de travail de mon père ont été réduites.",
@@ -276,73 +361,103 @@
         ]
     };
 
-    const SYSTEM_PROMPT = `Tu agiras en tant qu'expert de niveau universitaire en linguistique française, spécialisé en stylistique et en syntaxe avancée.
-Ta tâche est d'analyser une phrase erronée fournie par l'utilisateur selon la catégorie stylistique demandée.
+    // === System-Prompt für die KI === 
+    const SYSTEM_PROMPT = `Tu es un expert de niveau universitaire en linguistique française, spécialisé en stylistique et en syntaxe avancée.
 
-Ta réponse doit obligatoirement suivre cette structure en français (et uniquement cette structure, pas de texte d'introduction) :
+    Ta tâche est d'analyser une phrase française potentiellement erronée selon la catégorie stylistique demandée.
 
-[ANALYSE]
-Détaille précisément l'anomalie détectée (règle grammaticale ou stylistique violée de manière rigoureuse).
+    Ta réponse DOIT obligatoirement suivre cette structure en français (et uniquement cette structure) :
 
-[CORRECTION OPTIMISÉE]
-Donne la version corrigée et embellie de la phrase.
+    [ANALYSE]
+    Détaille précisément l'anomalie détectée (règle grammaticale ou stylistique violée de manière rigoureuse).
 
-[JUSTIFICATION]
-Justifie les changements apportés avec un vocabulaire académique et précis.`;
+    [CORRECTION OPTIMISÉE]
+    Donne la version corrigée et améliorée de la phrase.
 
-    // Presets beim Laden initialisieren
+    [JUSTIFICATION]
+    Justifie les changements apportés avec un vocabulaire académique et précis.
+
+    IMPORTANT : Ne réponds que dans ce format exact. Ne pas inclure de texte d'introduction ou de conclusion.`;
+
+    // === Initialisierung === 
     window.onload = function() {
         loadPresets();
+        checkApiKey();
     };
 
+    // === API-Key-Prüfung === 
+    function checkApiKey() {
+        const apiKeyInfo = document.getElementById('apiKeyInfo');
+        if (!API_KEY || API_KEY.trim() === "") {
+            apiKeyInfo.style.display = 'block';
+        } else {
+            apiKeyInfo.style.display = 'none';
+        }
+    }
+
+    // === Presets laden === 
     function loadPresets() {
         const category = document.getElementById('category').value;
         const container = document.getElementById('presets');
         container.innerHTML = '';
 
-        PRESETS[category].forEach(sentence => {
-            const btn = document.createElement('button');
-            btn.className = 'preset-btn';
-            btn.innerText = sentence.length > 50 ? sentence.substring(0, 47) + "..." : sentence;
-            btn.title = sentence;
-            btn.onclick = () => {
-                document.getElementById('sentence').value = sentence;
-            };
-            container.appendChild(btn);
-        });
+        if (PRESETS[category]) {
+            PRESETS[category].forEach(sentence => {
+                const btn = document.createElement('button');
+                btn.className = 'preset-btn';
+                btn.textContent = sentence.length > 50 ? sentence.substring(0, 47) + "..." : sentence;
+                btn.title = sentence;
+                btn.onclick = () => {
+                    document.getElementById('sentence').value = sentence;
+                    document.getElementById('sentence').focus();
+                };
+                container.appendChild(btn);
+            });
+        }
     }
 
+    // === Satz analysieren === 
     async function analyzeSentence() {
         const category = document.getElementById('category').value;
         const sentence = document.getElementById('sentence').value.trim();
-
-        if (!sentence) {
-            alert("Bitte gib einen Satz zur Analyse ein.");
-            return;
-        }
-
         const button = document.getElementById('analyzeBtn');
         const loading = document.getElementById('loading');
         const outputContainer = document.getElementById('outputContainer');
         const resultsDiv = document.getElementById('results');
+        const statusMessage = document.getElementById('statusMessage');
 
+        // Eingabevalidierung
+        if (!sentence) {
+            showStatusMessage("Bitte gib einen Satz zur Analyse ein.", "error");
+            document.getElementById('sentence').focus();
+            return;
+        }
+
+        // UI zurücksetzen
         button.disabled = true;
         loading.style.display = 'block';
-        loading.style.color = 'var(--primary-dark)';
-        loading.innerText = "Die linguistische Fakultät wertet aus...";
         outputContainer.classList.remove('active');
         resultsDiv.innerHTML = '';
+        statusMessage.style.display = 'none';
 
-        // Demo Modus falls kein API Key vorhanden
-        if (API_KEY === "DEIN_MISTRAL_API_KEY_HIER" || API_KEY.trim() === "") {
+        // Demo-Modus (kein API-Key)
+        if (!API_KEY || API_KEY.trim() === "") {
             setTimeout(() => {
-                loading.style.display = 'none';
                 button.disabled = false;
+                loading.style.display = 'none';
                 
                 resultsDiv.innerHTML = `
                     <div class="result-section">
-                        <div class="result-title">Analyse (Demo-Modus)</div>
-                        <p>Du musst erst deinen <strong>Mistral API-Key</strong> oben im JavaScript-Code eintragen, damit die Live-Analyse funktioniert!</p>
+                        <div class="result-title">Demo-Modus</div>
+                        <p>
+                            <strong>Hinweis:</strong> Diese Demo funktioniert ohne API-Key. 
+                            Für echte Analysen füge deinen <a href="https://console.mistral.ai/" target="_blank">Mistral API-Key</a> 
+                            im JavaScript-Code hinzu (Variable <code>API_KEY</code>).
+                        </p>
+                        <p>
+                            <strong>Beispielausgabe für diese Kategorie:</strong><br>
+                            <em>"${sentence}"</em> würde analysiert werden.
+                        </p>
                     </div>
                 `;
                 outputContainer.classList.add('active');
@@ -350,72 +465,126 @@ Justifie les changements apportés avec un vocabulaire académique et précis.`;
             return;
         }
 
+        // API-Anfrage
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'Authorization': "Bearer " + API_KEY
+                    'Authorization': `Bearer ${API_KEY}`
                 },
                 body: JSON.stringify({
-                    model: "mistral-small-latest",
+                    model: 'mistral-tiny-latest',
                     messages: [
                         { role: "system", content: SYSTEM_PROMPT },
-                        { role: "user", content: `Catégorie demandée : ${category}\nPhrase à analyser : "${sentence}"` }
+                        { 
+                            role: "user", 
+                            content: `Catégorie demandée : ${category}\nPhrase à analyser : "${sentence}"` 
+                        }
                     ],
                     temperature: 0.3
                 })
             });
 
             if (!response.ok) {
-                throw new Error("Server-Antwort nicht OK. Status: " + response.status);
+                const errorData = await response.json().catch(() => ({}));
+                let errorMessage = `Server-Fehler: ${response.status}`;
+                
+                if (response.status === 429) {
+                    errorMessage = "Rate-Limit erreicht! Bitte warte einen Moment und versuche es erneut.";
+                } else if (errorData.message) {
+                    errorMessage = errorData.message;
+                }
+                
+                throw new Error(errorMessage);
             }
 
             const data = await response.json();
             const textOutput = data.choices[0].message.content;
 
-            // Einfaches Parsen der vordefinierten Blöcke
-            const sections = textOutput.split(/\[(.*?)\]/g).filter(Boolean);
-            
-            let formattedHTML = "";
-            for (let i = 0; i < sections.length; i += 2) {
-                const title = sections[i] ? sections[i].trim() : "";
-                const content = sections[i+1] ? sections[i+1].trim().replace(/\n/g, '<br>') : "";
-                
-                if (title && content) {
-                    if (title.toUpperCase() === "CORRECTION OPTIMISÉE") {
+            // Ergebnis formatieren
+            const formattedHTML = formatAnalysisResult(textOutput);
+            resultsDiv.innerHTML = formattedHTML;
+            outputContainer.classList.add('active');
+            showStatusMessage("Analyse abgeschlossen!", "success");
+
+        } catch (error) {
+            showStatusMessage(`Fehler: ${error.message}`, "error");
+            outputContainer.classList.remove('active');
+        } finally {
+            button.disabled = false;
+            loading.style.display = 'none';
+        }
+    }
+
+    // === Ergebnis formatieren === 
+    function formatAnalysisResult(textOutput) {
+        // Versuche, die vordefinierten Blöcke zu parsen
+        const sections = textOutput.split(/\[(.*?)\]/g).filter(Boolean);
+        let formattedHTML = "";
+
+        for (let i = 0; i < sections.length; i += 2) {
+            const title = sections[i] ? sections[i].trim() : "";
+            const content = sections[i+1] ? sections[i+1].trim().replace(/\n/g, '<br>') : "";
+
+            if (title && content) {
+                switch(title.toUpperCase()) {
+                    case "CORRECTION OPTIMISÉE":
                         formattedHTML += `
                             <div class="result-section">
-                                <div class="result-title">Korrektur / Proposition</div>
+                                <div class="result-title">Korrekturvorschlag</div>
                                 <div class="correction-box">${content}</div>
                             </div>
                         `;
-                    } else {
+                        break;
+                    case "ANALYSE":
                         formattedHTML += `
                             <div class="result-section">
-                                <div class="result-title">${title === "ANALYSE" ? "Fehler-Diagnose" : "Linguistische Begründung"}</div>
+                                <div class="result-title">Fehleranalyse</div>
                                 <p>${content}</p>
                             </div>
                         `;
-                    }
+                        break;
+                    case "JUSTIFICATION":
+                        formattedHTML += `
+                            <div class="result-section">
+                                <div class="result-title">Begründung</div>
+                                <p>${content}</p>
+                            </div>
+                        `;
+                        break;
+                    default:
+                        formattedHTML += `
+                            <div class="result-section">
+                                <div class="result-title">${title}</div>
+                                <p>${content}</p>
+                            </div>
+                        `;
                 }
             }
+        }
 
-            if (!formattedHTML) {
-                // Fallback, falls die Strukturierung misslang
-                formattedHTML = `<div class="result-section"><p>${textOutput.replace(/\n/g, '<br>')}</p></div>`;
-            }
+        // Fallback, falls die Strukturierung fehlschlägt
+        if (!formattedHTML || formattedHTML.trim() === "") {
+            formattedHTML = `<div class="result-section"><p>${textOutput.replace(/\n/g, '<br>')}</p></div>`;
+        }
 
-            resultsDiv.innerHTML = formattedHTML;
-            outputContainer.classList.add('active');
+        return formattedHTML;
+    }
 
-        } catch (error) {
-            loading.style.color = "red";
-            loading.innerText = "Fehler bei der Analyse: " + error.message;
-            console.error(error);
-        } finally {
-            button.disabled = false;
+    // === Statusmeldung anzeigen === 
+    function showStatusMessage(message, type) {
+        const statusMessage = document.getElementById('statusMessage');
+        statusMessage.textContent = message;
+        statusMessage.className = `status-message status-${type}`;
+        statusMessage.style.display = 'block';
+        
+        // Nach 5 Sekunden automatisch ausblenden (nur für Erfolg/Fehler)
+        if (type !== 'error') {
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 5000);
         }
     }
 </script>

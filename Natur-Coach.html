@@ -437,7 +437,7 @@ Wenn du bereit bist, wünsche mir einen ruhigen Empfang und frage mich, welches 
                     'Authorization': `Bearer ${apiKey}`
                 },
                 body: JSON.stringify({
-                    model: 'mistral-small-latest',
+                    model: 'mistral-tiny-latest',
                     messages: [
                         { role: 'system', content: systemPrompt },
                         { role: 'user', content: userPrompt }
@@ -457,8 +457,16 @@ Wenn du bereit bist, wünsche mir einen ruhigen Empfang und frage mich, welches 
             ttsBtn.style.display = 'flex';
 
         } catch (err) {
-            responseArea.innerHTML = `<span style="color:red;">Fehler beim Empfangen des Impulses: ${err.message}</span>`;
+        if (err.message.includes("429")) {
+          responseArea.innerHTML = `
+            <span style="color: orange;">
+                ⏳ Rate-Limit erreicht! Bitte warte einen Moment und versuche es erneut.
+            </span>
+        `;
+        } else {
+          responseArea.innerHTML = `<span style="color: red;">Fehler: ${err.message}</span>`;
         }
+      }
     }
 </script>
 
