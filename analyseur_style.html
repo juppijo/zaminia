@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analyseur de Style & Syntaxe Stylistique</title>
+    <title>Analyseur de Style & Syntaxe – Français</title>
     <style>
         :root {
-            --primary: #00a8b5; /* Ton bleu-turquoise caractéristique */
+            --primary: #00a8b5;
             --primary-dark: #008894;
             --primary-light: #e6f7f8;
             --bg: #f4f9f9;
             --text: #2c3e50;
             --card-bg: #ffffff;
             --border: #d1e9ea;
+            --accent-orange: #ff7e67;
+            --error: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
         }
 
         * {
@@ -30,6 +34,7 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            line-height: 1.6;
         }
 
         .container {
@@ -70,7 +75,7 @@
             font-size: 0.9rem;
         }
 
-        select, textarea {
+        select, textarea, input {
             width: 100%;
             padding: 12px;
             border: 2px solid var(--border);
@@ -83,11 +88,11 @@
 
         textarea {
             resize: vertical;
-            min-height: 80px;
+            min-height: 100px;
             font-family: 'Courier New', Courier, monospace;
         }
 
-        select:focus, textarea:focus {
+        select:focus, textarea:focus, input:focus {
             outline: none;
             border-color: var(--primary);
         }
@@ -138,12 +143,37 @@
             transform: scale(0.98);
         }
 
+        button.action-btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+
         .loading {
             display: none;
             text-align: center;
             color: var(--primary-dark);
             font-weight: 600;
             margin: 20px 0;
+        }
+
+        .status-message {
+            text-align: center;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .status-error {
+            background-color: #fdecea;
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+
+        .status-success {
+            background-color: #e8f8f0;
+            color: var(--success);
+            border: 1px solid var(--success);
         }
 
         .output-container {
@@ -189,6 +219,41 @@
             margin-top: 10px;
             color: #14532d;
         }
+
+        .api-key-info {
+            background-color: #fff8e1;
+            border: 1px solid #ffc107;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #8d6e63;
+        }
+
+        .api-key-info a {
+            color: var(--primary-dark);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .api-key-info a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .preset-btn {
+                font-size: 0.75rem;
+                padding: 4px 8px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -198,6 +263,14 @@
         <h1>Analyseur de Style & Syntaxe</h1>
         <p class="subtitle">Outil d'analyse linguistique pour un français d'excellence</p>
     </header>
+
+    <div class="api-key-info" id="apiKeyInfo">
+        <strong>Note :</strong> Pour utiliser l'analyse avancée, entrez votre clé API Mistral ci-dessous ou définissez-la directement dans le code (variable <code>API_KEY</code>).
+        <br>Obtenez une clé gratuite sur <a href="https://console.mistral.ai/" target="_blank">Mistral Console</a>.
+        <br>
+        <label for="userApiKey">Clé API Mistral (optionnelle, prioritaire sur la clé en dur) :</label>
+        <input type="password" id="userApiKey" placeholder="Entrez votre clé API ici...">
+    </div>
 
     <div class="form-group">
         <label for="category">Choisir la catégorie d'erreur :</label>
@@ -213,35 +286,36 @@
     </div>
 
     <div class="form-group">
-        <label>Exemples issus de tes documents (Clique pour charger) :</label>
-        <div class="preset-container" id="presets">
-            </div>
+        <label>Exemples issus de vos documents (Cliquez pour charger) :</label>
+        <div class="preset-container" id="presets"></div>
     </div>
 
     <div class="form-group">
         <label for="sentence">Phrase en français à analyser :</label>
-        <textarea id="sentence" placeholder="Saisis une phrase ou choisis un exemple ci-dessus..."></textarea>
+        <textarea id="sentence" placeholder="Saisissez une phrase ou choisissez un exemple ci-dessus..." aria-label="Phrase à analyser"></textarea>
     </div>
 
-    <button class="action-btn" id="analyzeBtn" onclick="analyzeSentence()">Lancer l'analyse linguistique</button>
+    <button class="action-btn" id="analyzeBtn" onclick="analyzeSentence()" aria-label="Lancer l'analyse linguistique">
+        Lancer l'analyse linguistique
+    </button>
 
-    <div class="loading" id="loading">La faculté linguistique de Paris examine la structure...</div>
+    <div class="loading" id="loading" aria-live="polite">Analyse en cours...</div>
+    <div class="status-message" id="statusMessage" role="alert"></div>
 
     <div class="output-container" id="outputContainer">
         <h2>Rapport d'analyse stylistique :</h2>
-        <div id="results">
-            </div>
+        <div id="results"></div>
     </div>
 </div>
 
 <script>
-    // Configuration de l'API Mistral AI
-    const API_KEY = "DdYXru5rkrACFiEdsuh3jLpqtkeho7jE"; 
+    // === Configuration ===
+    // Remplacez cette valeur par votre clé API Mistral pour une utilisation en dur
+    // Si une clé est entrée dans le champ ci-dessus, elle sera prioritaire.
+  	const API_KEY = "TiIaORmMxnFunIhOgZK40MwRpbY1Ud9u"; // Laissez vide pour utiliser uniquement le champ de saisie
     const API_URL = "https://api.mistral.ai/v1/chat/completions";
 
-    //const API_KEY = "DEIN_MISTRAL_API_KEY_HIER"; 
-
-    // Exemples tirés directement de tes fichiers PDF
+    // === Presets (Exemples) ===
     const PRESETS = {
         solecisme: [
             "Après avoir frôlé la mort, les journées de travail de mon père ont été réduites.",
@@ -273,72 +347,151 @@
         ]
     };
 
-    const SYSTEM_PROMPT = `Tu agiras en tant qu'expert de niveau universitaire en linguistique française, spécialisé en stylistique et en syntaxe avancée.
-Ta tâche est d'analyser la phrase erronée fournie par l'utilisateur selon la catégorie stylistique demandée.
+    // === Règles locales pour le mode démo ===
+    const DEMO_RULES = {
+        pleonasme: {
+            patterns: [
+                { regex: /monter en haut|descendre en bas|sortir dehors|entrer dedans/gi, message: "Pléonasme détecté : l'expression est redondante." },
+                { regex: /voir de ses propres yeux/gi, message: "Pléonasme détecté : 'voir' implique déjà l'utilisation des yeux." }
+            ],
+            correction: (text) => {
+                return text
+                    .replace(/monter en haut/gi, "monter")
+                    .replace(/descendre en bas/gi, "descendre")
+                    .replace(/sortir dehors/gi, "sortir")
+                    .replace(/entrer dedans/gi, "entrer")
+                    .replace(/voir de ses propres yeux/gi, "voir");
+            }
+        },
+        animisme: {
+            patterns: [
+                { regex: /la loi a (décidé|choisi|voulu)/gi, message: "Animisme abusif : la loi ne peut pas 'décider' ou 'vouloir'. Utilisez un sujet humain ou une formulation impersonnelle." },
+                { regex: /l'ordinateur a (refusé|accepté|décidé)/gi, message: "Animisme abusif : l'ordinateur ne peut pas 'refuser' ou 'décider'. Préférez une formulation passive ou technique." }
+            ],
+            correction: (text) => {
+                return text
+                    .replace(/la loi a décidé/gi, "il a été décidé par la loi")
+                    .replace(/la loi a choisi/gi, "la loi prévoit")
+                    .replace(/la loi a voulu/gi, "la loi impose")
+                    .replace(/l'ordinateur a refusé/gi, "l'ordinateur n'a pas permis")
+                    .replace(/l'ordinateur a accepté/gi, "l'ordinateur a autorisé")
+                    .replace(/l'ordinateur a décidé/gi, "le système a déterminé");
+            }
+        },
+        registre: {
+            patterns: [
+                { regex: /chié dans les bottes/gi, message: "Registre inapproprié : cette expression est trop familière pour un contexte formel." },
+                { regex: /crèchant/gi, message: "Registre inapproprié : 'crèchant' est un terme trop familier. Utilisez 'vivant' ou 'résidant'." }
+            ],
+            correction: (text) => {
+                return text
+                    .replace(/chié dans les bottes/gi, "porté un coup dur à")
+                    .replace(/crèchant/gi, "vivant");
+            }
+        }
+    };
 
-Ta réponse doit obligatoirement suivre cette structure exacte en français (et uniquement cette structure, sans introduction ni conclusion) :
+    // === System Prompt pour l'API ===
+    const SYSTEM_PROMPT = `Tu es un expert de niveau universitaire en linguistique française, spécialisé en stylistique et en syntaxe avancée.
 
-[ANALYSE]
-Détaille précisément l'anomalie détectée (règle grammaticale ou stylistique violée, de manière rigoureuse et académique).
+    Ta tâche est d'analyser une phrase française potentiellement erronée selon la catégorie stylistique demandée.
 
-[CORRECTION OPTIMISÉE]
-Donne la version corrigée, fluide et embellie de la phrase.
+    Ta réponse DOIT obligatoirement suivre cette structure en français (et uniquement cette structure) :
 
-[JUSTIFICATION]
-Justifie de façon théorique et stylistique les changements apportés avec un vocabulaire académique précis (syllepses, anacoluthes, etc.).`;
+    [ANALYSE]
+    Détaille précisément l'anomalie détectée (règle grammaticale ou stylistique violée de manière rigoureuse).
 
+    [CORRECTION OPTIMISÉE]
+    Donne la version corrigée et améliorée de la phrase.
+
+    [JUSTIFICATION]
+    Justifie les changements apportés avec un vocabulaire académique et précis.
+
+    IMPORTANT : Ne réponds que dans ce format exact. Ne pas inclure de texte d'introduction ou de conclusion.`;
+
+    // === Initialisation ===
     window.onload = function() {
         loadPresets();
     };
 
+    // === Charger les présélections ===
     function loadPresets() {
         const category = document.getElementById('category').value;
         const container = document.getElementById('presets');
         container.innerHTML = '';
 
-        PRESETS[category].forEach(sentence => {
-            const btn = document.createElement('button');
-            btn.className = 'preset-btn';
-            btn.innerText = sentence.length > 50 ? sentence.substring(0, 47) + "..." : sentence;
-            btn.title = sentence;
-            btn.onclick = () => {
-                document.getElementById('sentence').value = sentence;
-            };
-            container.appendChild(btn);
-        });
+        if (PRESETS[category]) {
+            PRESETS[category].forEach(sentence => {
+                const btn = document.createElement('button');
+                btn.className = 'preset-btn';
+                btn.textContent = sentence.length > 50 ? sentence.substring(0, 47) + "..." : sentence;
+                btn.title = sentence;
+                btn.onclick = () => {
+                    document.getElementById('sentence').value = sentence;
+                    document.getElementById('sentence').focus();
+                };
+                container.appendChild(btn);
+            });
+        }
     }
 
+    // === Analyser la phrase ===
     async function analyzeSentence() {
         const category = document.getElementById('category').value;
         const sentence = document.getElementById('sentence').value.trim();
-
-        if (!sentence) {
-            alert("Veuillez saisir une phrase à analyser.");
-            return;
-        }
-
+        const userApiKey = document.getElementById('userApiKey').value.trim();
         const button = document.getElementById('analyzeBtn');
         const loading = document.getElementById('loading');
         const outputContainer = document.getElementById('outputContainer');
         const resultsDiv = document.getElementById('results');
+        const statusMessage = document.getElementById('statusMessage');
 
+        // Validation de l'entrée
+        if (!sentence) {
+            showStatusMessage("Veuillez entrer une phrase à analyser.", "error");
+            document.getElementById('sentence').focus();
+            return;
+        }
+
+        // Réinitialiser l'UI
         button.disabled = true;
         loading.style.display = 'block';
-        loading.style.color = 'var(--primary-dark)';
-        loading.innerText = "Analyse en cours par l'expert linguistique...";
         outputContainer.classList.remove('active');
         resultsDiv.innerHTML = '';
+        statusMessage.style.display = 'none';
 
-        // Mode démo si aucune clé API n'est configurée
-        if (API_KEY === "DEIN_MISTRAL_API_KEY_HIER" || API_KEY.trim() === "") {
+        // Utiliser la clé API entrée par l'utilisateur ou la clé en dur
+        const apiKeyToUse = userApiKey || API_KEY;
+
+        // Mode démo (sans clé API)
+        if (!apiKeyToUse) {
             setTimeout(() => {
-                loading.style.display = 'none';
                 button.disabled = false;
-                
+                loading.style.display = 'none';
+
+                // Analyser localement si des règles existent pour cette catégorie
+                if (DEMO_RULES[category]) {
+                    const demoResult = analyzeLocally(category, sentence);
+                    if (demoResult) {
+                        resultsDiv.innerHTML = demoResult;
+                        outputContainer.classList.add('active');
+                        showStatusMessage("Analyse locale terminée ! Pour une analyse avancée, entrez une clé API Mistral.", "success");
+                        return;
+                    }
+                }
+
+                // Sinon, afficher un message générique
                 resultsDiv.innerHTML = `
                     <div class="result-section">
-                        <div class="result-title">Analyse (Mode Démo)</div>
-                        <p>Veuillez insérer votre <strong>clé API Mistral</strong> dans le code JavaScript pour activer l'analyse en temps réel !</p>
+                        <div class="result-title">Mode démo</div>
+                        <p>
+                            <strong>Note :</strong> Cette démo fonctionne sans clé API.
+                            Pour une analyse avancée, entrez votre <a href="https://console.mistral.ai/" target="_blank">clé API Mistral</a> ci-dessus ou définissez-la dans le code.
+                        </p>
+                        <p>
+                            <strong>Exemple de sortie pour cette catégorie :</strong><br>
+                            <em>"${sentence}"</em> serait analysé en détail.
+                        </p>
                     </div>
                 `;
                 outputContainer.classList.add('active');
@@ -346,78 +499,182 @@ Justifie de façon théorique et stylistique les changements apportés avec un v
             return;
         }
 
+        // Requête API
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'Authorization': "Bearer " + API_KEY
+                    'Authorization': `Bearer ${apiKeyToUse}`
                 },
                 body: JSON.stringify({
-                    model: "mistral-small-latest",
+                    model: 'mistral-tiny-latest',
                     messages: [
                         { role: "system", content: SYSTEM_PROMPT },
-                        { role: "user", content: `Catégorie : ${category}\nPhrase : "${sentence}"` }
+                        {
+                            role: "user",
+                            content: `Catégorie demandée : ${category}\nPhrase à analyser : "${sentence}"`
+                        }
                     ],
                     temperature: 0.3
                 })
             });
 
             if (!response.ok) {
-                throw new Error("Réponse du serveur incorrecte. Statut : " + response.status);
+                const errorData = await response.json().catch(() => ({}));
+                let errorMessage = `Erreur serveur : ${response.status}`;
+
+                if (response.status === 401) {
+                    errorMessage = "Clé API invalide. Vérifiez que votre clé Mistral est correcte.";
+                } else if (response.status === 429) {
+                    errorMessage = "Limite de requêtes atteinte ! Veuillez patienter un moment et réessayer.";
+                } else if (errorData.message) {
+                    errorMessage = errorData.message;
+                }
+
+                throw new Error(errorMessage);
             }
 
             const data = await response.json();
+
+            // Vérifier que la réponse contient des choix
+            if (!data.choices || data.choices.length === 0) {
+                throw new Error("Aucune réponse reçue de l'API. Vérifiez votre clé API ou réessayez.");
+            }
+
             const textOutput = data.choices[0].message.content;
 
-            // Analyse et formatage du retour structuré de l'IA
-            const sections = textOutput.split(/\[(.*?)\]/g).filter(Boolean);
-            
-            let formattedHTML = "";
-            for (let i = 0; i < sections.length; i += 2) {
-                const title = sections[i] ? sections[i].trim() : "";
-                const content = sections[i+1] ? sections[i+1].trim().replace(/\n/g, '<br>') : "";
-                
-                if (title && content) {
-                    if (title.toUpperCase() === "CORRECTION OPTIMISÉE") {
+            // Formater le résultat
+            const formattedHTML = formatAnalysisResult(textOutput);
+            resultsDiv.innerHTML = formattedHTML;
+            outputContainer.classList.add('active');
+            showStatusMessage("Analyse terminée avec succès !", "success");
+
+        } catch (error) {
+            showStatusMessage(`Erreur : ${error.message}`, "error");
+            outputContainer.classList.remove('active');
+        } finally {
+            button.disabled = false;
+            loading.style.display = 'none';
+        }
+    }
+
+    // === Analyser localement (mode démo) ===
+    function analyzeLocally(category, sentence) {
+        if (!DEMO_RULES[category]) {
+            return null;
+        }
+
+        const rules = DEMO_RULES[category];
+        let analysis = "";
+        let correction = sentence;
+        let justification = "";
+
+        // Appliquer les règles de détection
+        rules.patterns.forEach(rule => {
+            if (rule.regex.test(sentence)) {
+                analysis += `<p>${rule.message}</p>`;
+            }
+        });
+
+        // Appliquer les corrections
+        correction = rules.correction(sentence);
+
+        if (analysis === "") {
+            analysis = "<p>Aucune anomalie évidente détectée pour cette catégorie en mode démo.</p>";
+        } else {
+            justification = "<p>Correction automatique appliquée en fonction des règles locales.</p>";
+        }
+
+        if (correction === sentence) {
+            correction = "<em>Aucune correction automatique disponible pour cette phrase.</em>";
+        }
+
+        return `
+            <div class="result-section">
+                <div class="result-title">Analyse</div>
+                ${analysis}
+            </div>
+            <div class="result-section">
+                <div class="result-title">Correction optimisée</div>
+                <div class="correction-box">${correction}</div>
+            </div>
+            <div class="result-section">
+                <div class="result-title">Justification</div>
+                ${justification}
+            </div>
+        `;
+    }
+
+    // === Formater le résultat de l'analyse ===
+    function formatAnalysisResult(textOutput) {
+        // Diviser le texte en sections
+        const sections = textOutput.split(/\[(.*?)\]/g).filter(Boolean);
+        let formattedHTML = "";
+
+        for (let i = 0; i < sections.length; i += 2) {
+            const title = sections[i] ? sections[i].trim() : "";
+            const content = sections[i + 1] ? sections[i + 1].trim().replace(/\n/g, '<br>') : "";
+
+            if (title && content) {
+                switch (title.toUpperCase()) {
+                    case "CORRECTION OPTIMISÉE":
                         formattedHTML += `
                             <div class="result-section">
-                                <div class="result-title">Correction & Amélioration</div>
+                                <div class="result-title">Correction optimisée</div>
                                 <div class="correction-box">${content}</div>
                             </div>
                         `;
-                    } else if (title.toUpperCase() === "ANALYSE") {
+                        break;
+                    case "ANALYSE":
                         formattedHTML += `
                             <div class="result-section">
-                                <div class="result-title">Diagnostic des anomalies</div>
+                                <div class="result-title">Analyse</div>
                                 <p>${content}</p>
                             </div>
                         `;
-                    } else {
+                        break;
+                    case "JUSTIFICATION":
                         formattedHTML += `
                             <div class="result-section">
-                                <div class="result-title">Justification académique</div>
+                                <div class="result-title">Justification</div>
                                 <p>${content}</p>
                             </div>
                         `;
-                    }
+                        break;
+                    default:
+                        formattedHTML += `
+                            <div class="result-section">
+                                <div class="result-title">${title}</div>
+                                <p>${content}</p>
+                            </div>
+                        `;
                 }
             }
+        }
 
-            if (!formattedHTML) {
-                formattedHTML = `<div class="result-section"><p>${textOutput.replace(/\n/g, '<br>')}</p></div>`;
-            }
+        // Solution de repli si le formatage échoue
+        if (!formattedHTML || formattedHTML.trim() === "") {
+            formattedHTML = `<div class="result-section"><p>${textOutput.replace(/\n/g, '<br>')}</p></div>`;
+        }
 
-            resultsDiv.innerHTML = formattedHTML;
-            outputContainer.classList.add('active');
+        return formattedHTML;
+    }
 
-        } catch (error) {
-            loading.style.color = "red";
-            loading.innerText = "Erreur lors de l'analyse : " + error.message;
-            console.error(error);
-        } finally {
-            button.disabled = false;
+    // === Afficher un message de statut ===
+    function showStatusMessage(message, type) {
+        const statusMessage = document.getElementById('statusMessage');
+        statusMessage.textContent = message;
+        statusMessage.className = `status-message status-${type}`;
+        statusMessage.style.display = 'block';
+        statusMessage.setAttribute('aria-live', 'assertive');
+
+        // Masquer automatiquement après 5 secondes (sauf pour les erreurs)
+        if (type !== 'error') {
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 5000);
         }
     }
 </script>
