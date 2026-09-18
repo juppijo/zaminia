@@ -181,7 +181,7 @@
 <script>
 
     // Konfiguration für die Mistral AI API
-    const API_KEY = "DdYXru5rkrACFiEdsuh3jLpqtkeho7jE"; 
+    const API_KEY = "TiIaORmMxnFunIhOgZK40MwRpbY1Ud9u";
     const API_URL = "https://api.mistral.ai/v1/chat/completions";
 
     const SYSTEM_PROMPT = `Du bist ein hochentwickelter Kommunikations-Assistent, der auf die '3A-Methode' spezialisiert ist. 
@@ -244,7 +244,7 @@ Gib exakt 3 ausformulierte Beispiele als Antwort zurück. Trenne die Beispiele N
                     'Authorization': "Bearer " + API_KEY
                 },
                 body: JSON.stringify({
-                    model: "mistral-small-latest",
+                    model: 'mistral-tiny-latest',
                     messages: [
                         { role: "system", content: SYSTEM_PROMPT },
                         { role: "user", content: "Kontext: " + context + "\nUrsprüngliche Frage: " + rawQuestion }
