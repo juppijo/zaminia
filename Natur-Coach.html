@@ -458,15 +458,15 @@ Wenn du bereit bist, wünsche mir einen ruhigen Empfang und frage mich, welches 
 
         } catch (err) {
         if (err.message.includes("429")) {
-          responseArea.innerHTML = `
-            <span style="color: orange;">
-                ⏳ Rate-Limit erreicht! Bitte warte einen Moment und versuche es erneut.
-            </span>
-        `;
-        } else {
-          responseArea.innerHTML = `<span style="color: red;">Fehler: ${err.message}</span>`;
+            responseArea.innerHTML = `
+              <span style="color: orange;">
+                  ⏳ Rate-Limit erreicht! Bitte warte einen Moment und versuche es erneut.
+              </span>
+          `;
+          } else {
+            responseArea.innerHTML = `<span style="color: red;">Fehler: ${err.message}</span>`;
+          }
         }
-      }
     }
 </script>
 
