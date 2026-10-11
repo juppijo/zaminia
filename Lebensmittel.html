@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lebensmittel</title>
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)']
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]']
+        ]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 40px;
+      color: #112255;
+      background: #ededfd;
+      max-width : 1000px;
+      text-align: justify;
+      padding : auto;
+      margin  : auto;
+      }
+      h1 {
+        color: #112299;
+      }
+      .button-container {
+        display: flex;
+        justify-content: flex-end; 
+        padding: 10px 15px; 
+        gap: 10px; 
+      }
+      .link-box-button {
+        justify-content: flex-end;
+        padding: 10px 18px;
+        background: #112299;
+        color: #eeddff;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 8px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        transition: opacity 0.2s ease;
+        cursor: pointer; 
+      }
+      .link-box-button:hover {
+        background: #666688;
+        padding: 10px 19px;
+      }
+  </style>
+</head>
+<body>
+  <div class="button-container">
+    <button class="link-box-button" onclick="toggleFullscreen()">⛶</button>
+  </div>
+  <h1>Lebensmittel</h1>
+
+  <table class="min-w-full border-collapse">
+    <tr class="group">
+      <th class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px 1px 2px; border-style: solid; background-color: rgb(12, 4, 52); color: rgb(130, 155, 211); font-weight: 600;">Kategorie</th>
+      <th class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px 1px 2px; border-style: solid; background-color: rgb(12, 4, 52); color: rgb(130, 155, 211); font-weight: 600;">Information</th>
+    </tr>
+    <tr class="group" style="">
+      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid;">Lebensmittel</td>
+      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid;">Eier (Hühnerei, ganztags)</td>
+    </tr>
+    <tr class="group" style="">
+      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid; background-color: rgba(30, 41, 59, 0.5);">Kalorien &amp; Makronährstoffe</td>
+      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid; background-color: rgba(30, 41, 59, 0.5);">ca. 155 kcal</td>
+    </tr>
+    <tr class="group" style="">
+      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid;">Wichtige Vitamine</td>
+      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid;">Vitamin A (ca. 160 µg), Vitamin D (ca. 2 µg), Vitamin E, Vitamin B2 (Riboflavin), Vitamin B12</td>
+    </tr>
+    <tr class="group" style="">
+      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid; background-color: rgba(30, 41, 59, 0.5);">Wichtige Mineralien</td>
+      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid; background-color: rgba(30, 41, 59, 0.5);">Eisen, Zink, Calcium, Phosphor, Selen</td>
+    </tr>
+    <tr class="group" style="">
+      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid;">Cholesterin &amp; Fette</td>
+      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid;">Cholesteringehalt: ca. 370–400 mg pro 100 g; Anteil gesättigter Fettsäuren (ca. 3,1 g) überwiegend ausgeglichen durch ungesättigte Fettsäuren; moderater LDL-Einfluss bei gesunden Menschen (Phospholipide/Lecithin hemmen teilweise die Cholesterinaufnahme)</td>
+    </tr>
+    <tr class="group" style="">
+      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid; background-color: rgba(30, 41, 59, 0.5);">Chinesische 5-Elemente-Lehre</td>
+      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid; background-color: rgba(30, 41, 59, 0.5);">Element: Erde (Eigelb) / Wasser (Eiweiß); Thermische Wirkung: neutral bis leicht kühlend (Eiweiß kühlend, Eigelb neutral); Geschmack: süß, salzig</td>
+    </tr>
+    <tr class="group" style="">
+      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid;">Gesundheitlicher Einfluss</td>
+      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid;">Positiv: Hervorragende biologische Wertigkeit des Proteins, fördert Muskelaufbau und Sättigung, enthält Cholin (unterstützt Gehirnfunktion und Leberstoffwechsel), reich an Antioxidantien (Lutein/Zeaxanthin für die Augen). Negativ: Hoher Cholesteringehalt kann bei bestimmten Stoffwechseltypen (Hyperrespondern) den LDL-Spiegel ungünstig beeinflussen; Risiko bei mangelnder Hygiene/Frische (Salmonellen).</td>
+    </tr>
+  </table>
+
+  <script>
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert("Fehler beim Aktivieren des Vollbildmodus!");
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+  </script>
+</body>
+</html>
