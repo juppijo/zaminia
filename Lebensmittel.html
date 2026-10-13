@@ -1,119 +1,44 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lebensmittel</title>
-  <script>
-    MathJax = {
-      tex: {
-        inlineMath: [
-          ['$', '$'],
-          ['\\(', '\\)']
-        ],
-        displayMath: [
-          ['$$', '$$'],
-          ['\\[', '\\]']
-        ]
-      },
-      svg: {
-        fontCache: 'global'
-      }
-    };
-  </script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <style>
-    body {
-      font-family: sans-serif;
-      margin: 40px;
-      color: #112255;
-      background: #ededfd;
-      max-width : 1000px;
-      text-align: justify;
-      padding : auto;
-      margin  : auto;
-      }
-      h1 {
-        color: #112299;
-      }
-      .button-container {
-        display: flex;
-        justify-content: flex-end; 
-        padding: 10px 15px; 
-        gap: 10px; 
-      }
-      .link-box-button {
-        justify-content: flex-end;
-        padding: 10px 18px;
-        background: #112299;
-        color: #eeddff;
-        font-size: 13px;
-        font-weight: 600;
-        border-radius: 8px;
-        white-space: nowrap;
-        flex-shrink: 0;
-        transition: opacity 0.2s ease;
-        cursor: pointer; 
-      }
-      .link-box-button:hover {
-        background: #666688;
-        padding: 10px 19px;
-      }
-  </style>
-</head>
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tabelle</title>
+<style>body{margin:24px;font-family:system-ui,sans-serif}
+.tbl{border-collapse:separate;border-spacing:0;width:100%;font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#e9d5ff;background:#0b0b14;border-radius:12px;overflow:hidden;box-shadow:0 6px 22px rgba(0,0,0,.18);border-top:1px solid #6d28d9;border-left:1px solid #6d28d9;}
+.tbl th,.tbl td{padding:12px 17px;text-align:left;vertical-align:top;border-right:1px solid #6d28d9;border-bottom:1px solid #6d28d9;}
+.tbl th{background:#a855f7;color:#ffffff;font-weight:700}
+.tbl tbody tr:nth-child(even) td{background:#14142a}
+.tbl tbody td:first-child{font-weight:600}
+.tbl tbody tr:hover td{background-image:linear-gradient(rgba(128,128,128,.18),rgba(128,128,128,.18))}
+</style></head>
 <body>
-  <div class="button-container">
-    <button class="link-box-button" onclick="toggleFullscreen()">⛶</button>
-  </div>
-  <h1>Lebensmittel</h1>
-
-  <table class="min-w-full border-collapse">
-    <tr class="group">
-      <th class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px 1px 2px; border-style: solid; background-color: rgb(12, 4, 52); color: rgb(130, 155, 211); font-weight: 600;">Kategorie</th>
-      <th class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px 1px 2px; border-style: solid; background-color: rgb(12, 4, 52); color: rgb(130, 155, 211); font-weight: 600;">Information</th>
-    </tr>
-    <tr class="group" style="">
-      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid;">Lebensmittel</td>
-      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid;">Eier (Hühnerei, ganztags)</td>
-    </tr>
-    <tr class="group" style="">
-      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid; background-color: rgba(30, 41, 59, 0.5);">Kalorien &amp; Makronährstoffe</td>
-      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid; background-color: rgba(30, 41, 59, 0.5);">ca. 155 kcal</td>
-    </tr>
-    <tr class="group" style="">
-      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid;">Wichtige Vitamine</td>
-      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid;">Vitamin A (ca. 160 µg), Vitamin D (ca. 2 µg), Vitamin E, Vitamin B2 (Riboflavin), Vitamin B12</td>
-    </tr>
-    <tr class="group" style="">
-      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid; background-color: rgba(30, 41, 59, 0.5);">Wichtige Mineralien</td>
-      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid; background-color: rgba(30, 41, 59, 0.5);">Eisen, Zink, Calcium, Phosphor, Selen</td>
-    </tr>
-    <tr class="group" style="">
-      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid;">Cholesterin &amp; Fette</td>
-      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid;">Cholesteringehalt: ca. 370–400 mg pro 100 g; Anteil gesättigter Fettsäuren (ca. 3,1 g) überwiegend ausgeglichen durch ungesättigte Fettsäuren; moderater LDL-Einfluss bei gesunden Menschen (Phospholipide/Lecithin hemmen teilweise die Cholesterinaufnahme)</td>
-    </tr>
-    <tr class="group" style="">
-      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid; background-color: rgba(30, 41, 59, 0.5);">Chinesische 5-Elemente-Lehre</td>
-      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid; background-color: rgba(30, 41, 59, 0.5);">Element: Erde (Eigelb) / Wasser (Eiweiß); Thermische Wirkung: neutral bis leicht kühlend (Eiweiß kühlend, Eigelb neutral); Geschmack: süß, salzig</td>
-    </tr>
-    <tr class="group" style="">
-      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid;">Gesundheitlicher Einfluss</td>
-      <td class="p-3 text-left relative group border-slate-200 dark:border-slate-800 outline-none" style="padding: 6px 10px; border-width: 1px; border-style: solid;">Positiv: Hervorragende biologische Wertigkeit des Proteins, fördert Muskelaufbau und Sättigung, enthält Cholin (unterstützt Gehirnfunktion und Leberstoffwechsel), reich an Antioxidantien (Lutein/Zeaxanthin für die Augen). Negativ: Hoher Cholesteringehalt kann bei bestimmten Stoffwechseltypen (Hyperrespondern) den LDL-Spiegel ungünstig beeinflussen; Risiko bei mangelnder Hygiene/Frische (Salmonellen).</td>
-    </tr>
-  </table>
-
-  <script>
-    function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => {
-          alert("Fehler beim Aktivieren des Vollbildmodus!");
-        });
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        }
-      }
-    }
-  </script>
-</body>
-</html>
+<table class="tbl">
+<thead><tr><th>Lebensmittel</th><th>Kalorien &amp; Makronährstoffe (pro 100 g)</th><th>Wichtige Vitamine</th><th>Wichtige Mineralien</th><th>Cholesterin &amp; Fette</th><th>Chinesische 5-Elemente-Lehre</th><th>Gesundheitlicher Einfluss</th></tr></thead>
+<tbody>
+<tr><td>**Apfel (roh)**</td><td>52 kcal, 14 g KH, 0,3 g Protein, 0,2 g Fett</td><td>Vitamin C (ca. 5 mg), K1 (ca. 2 µg), geringe Mengen B-Vitamine</td><td>Kalium (ca. 107 mg), wenig Kalzium, Eisen, Magnesium</td><td>0 mg Cholesterin, sehr fettarm; Pektin kann LDL leicht senken</td><td>Erde, kühl, süß-sauer</td><td>+ Ballaststoffe (Pektin), sättigend, Polyphenole; – Fruktose und Säure bei empfindlichem Magen oder Fruktoseintoleranz</td></tr>
+<tr><td>**Avocado**</td><td>160 kcal, 9 g KH (ca. 7 g Ballaststoffe), 2 g Protein, 15 g Fett</td><td>K1 (ca. 21 µg), Folat (ca. 81 µg), E (ca. 2 mg), B5, C</td><td>Kalium (ca. 485 mg), Magnesium (ca. 29 mg)</td><td>0 mg Cholesterin; ca. 2 g gesättigt, ca. 10 g einfach ungesättigt; senkt LDL im Austausch gegen gesättigte Fette</td><td>Erde, kühl, süß</td><td>+ Herzgesundheit, Ballaststoffe, bessere Aufnahme fettlöslicher Vitamine; – energiedicht, Latex-Frucht-Syndrom möglich</td></tr>
+<tr><td>**Banane**</td><td>89 kcal, 23 g KH, 1,1 g Protein, 0,3 g Fett</td><td>B6 (ca. 0,4 mg), C (ca. 9 mg), Folat</td><td>Kalium (ca. 360 mg), Magnesium (ca. 27 mg), Mangan</td><td>0 mg Cholesterin, fettarm; neutraler bis leicht positiver LDL-Einfluss</td><td>Erde, kühl bis kalt, süß</td><td>+ Kalium für Blutdruck und Muskeln, schnelle Energie; – hoher Zuckergehalt, reife Früchte mit höherem glykämischem Index</td></tr>
+<tr><td>**Blaubeere (Heidelbeere)**</td><td>57 kcal, 14 g KH, 0,7 g Protein, 0,3 g Fett</td><td>C (ca. 10 mg), K1 (ca. 19 µg), E</td><td>Mangan (ca. 0,3 mg), Kalium (ca. 77 mg)</td><td>0 mg Cholesterin, fettarm; Anthocyane können LDL-Oxidation reduzieren</td><td>Holz/Wasser, neutral bis kühl, süß-sauer</td><td>+ sehr viele Antioxidantien, gut für Gefäße und Gehirn; – Vitamin K bei Blutverdünnern (Cumarine) beachten</td></tr>
+<tr><td>**Brokkoli**</td><td>34 kcal, 7 g KH, 2,8 g Protein, 0,4 g Fett</td><td>C (ca. 89 mg), K1 (ca. 100 µg), Folat (ca. 63 µg)</td><td>Kalium (ca. 316 mg), Kalzium (ca. 47 mg), Eisen (ca. 0,7 mg)</td><td>0 mg Cholesterin, sehr fettarm; Ballaststoffe binden Gallensäuren, können LDL senken</td><td>Holz/Erde, kühl, süß-bitter</td><td>+ Glucosinolate (Sulforaphan), Zellschutz, Verdauung; – Blähungen bei empfindlichem Darm, Jodaufnahme-Hemmung nur bei großen Rohmengen und Jodmangel</td></tr>
+<tr><td>**Gouda (Hartkäse, Richtwert)**</td><td>ca. 356 kcal, 2 g KH, 25 g Protein, 27 g Fett</td><td>B12 (ca. 1,5 µg), A, B2, K2</td><td>Kalzium (ca. 740 mg), Phosphor, Zink, Natrium (ca. 800 mg)</td><td>ca. 114 mg Cholesterin; ca. 17 g gesättigt; kann LDL erhöhen</td><td>Erde, neutral bis kühl, süß-salzig</td><td>+ sehr kalziumreich, Protein; – viel gesättigtes Fett und Salz, kalorienreich</td></tr>
+<tr><td>**Haferflocken**</td><td>372 kcal, 59 g KH, 13 g Protein, 7 g Fett</td><td>B1 (ca. 0,5 mg), Folat, B5</td><td>Magnesium (ca. 130 mg), Eisen (ca. 4,5 mg), Zink (ca. 4 mg), Mangan, Phosphor</td><td>0 mg Cholesterin; überwiegend ungesättigt (ca. 1,2 g gesättigt); Beta-Glucan senkt nachweislich LDL</td><td>Erde, warm, süß</td><td>+ Beta-Glucan (Cholesterin, Blutzucker), lange Sättigung; – mögliche Gluten-Kontamination (Zöliakie), Phytinsäure</td></tr>
+<tr><td>**Hühnerbrust (gegart, ohne Haut)**</td><td>165 kcal, 0 g KH, 31 g Protein, 3,6 g Fett</td><td>B3 (ca. 10 mg), B6 (ca. 0,6 mg), B12, B5</td><td>Phosphor (ca. 228 mg), Selen (ca. 27 µg), Kalium, Zink</td><td>ca. 85 mg Cholesterin; ca. 1 g gesättigt, Rest überwiegend ungesättigt; geringer LDL-Einfluss</td><td>Erde, warm, süß</td><td>+ hochwertiges mageres Protein, Muskelerhalt; – Salmonellen-Risiko bei unzureichendem Garen, Panade und Frittieren verschlechtern das Profil</td></tr>
+<tr><td>**Hühnerei (ganz)**</td><td>143 kcal, 0,7 g KH, 12,6 g Protein, 9,5 g Fett</td><td>D (ca. 2 µg), B12 (ca. 1,1 µg), A (ca. 160 µg), Cholin (ca. 250 mg), B2</td><td>Selen (ca. 31 µg), Eisen (ca. 1,8 mg), Jod, Phosphor, Zink</td><td>ca. 370 mg Cholesterin; ca. 3,1 g gesättigt; Nahrungscholesterin beeinflusst LDL meist nur gering</td><td>Erde, neutral, süß</td><td>+ vollständiges Protein, Cholin, Lutein für die Augen; – Salmonellen bei Rohverzehr, bei Hypercholesterinämie moderat verzehren</td></tr>
+<tr><td>**Karotte (roh)**</td><td>41 kcal, 10 g KH, 0,9 g Protein, 0,2 g Fett</td><td>Beta-Carotin/Vitamin A (ca. 835 µg RAE), K1 (ca. 13 µg), B6</td><td>Kalium (ca. 320 mg), Mangan, wenig Kalzium</td><td>0 mg Cholesterin, fettarm; lösliche Ballaststoffe leicht LDL-senkend</td><td>Erde, neutral, süß</td><td>+ Augen, Haut, Immunsystem; Carotinoide mit Fett besser aufnehmbar; – sehr hohe Mengen können Haut gelblich färben (harmlos)</td></tr>
+<tr><td>**Kartoffel (roh)**</td><td>77 kcal, 17 g KH, 2 g Protein, 0,1 g Fett</td><td>C (ca. 20 mg), B6 (ca. 0,3 mg), Folat</td><td>Kalium (ca. 420 mg), Magnesium, Phosphor</td><td>0 mg Cholesterin, nahezu fettfrei; Zubereitung bestimmt Fettqualität</td><td>Erde, neutral, süß</td><td>+ sättigend, kaliumreich, abgekühlt resistente Stärke; – hoher GI bei heißem Püree oder Pommes, grüne Stellen enthalten Solanin</td></tr>
+<tr><td>**Knoblauch**</td><td>149 kcal, 33 g KH, 6,4 g Protein, 0,5 g Fett</td><td>B6 (ca. 1,2 mg), C (ca. 31 mg)</td><td>Mangan (ca. 1,7 mg), Selen (ca. 14 µg), Kalium (ca. 401 mg), Kalzium</td><td>0 mg Cholesterin, fettarm; Allicin kann LDL und Blutdruck leicht senken</td><td>Metall, heiß, scharf</td><td>+ antimikrobiell, Gefäßschutz; – Mundgeruch, Magenreizung, erhöhte Blutungsneigung bei hohen Mengen (Blutverdünner beachten)</td></tr>
+<tr><td>**Lachs (Zuchtlachs, roh)**</td><td>208 kcal, 0 g KH, 20 g Protein, 13 g Fett</td><td>D (ca. 11 µg), B12 (ca. 3 µg), B3 (ca. 8 mg), B6</td><td>Selen (ca. 25 µg), Kalium, Phosphor, Jod</td><td>ca. 55 mg Cholesterin; ca. 3 g gesättigt, ca. 2 g Omega-3 (EPA/DHA); günstig für Triglyceride, LDL neutral</td><td>Erde/Wasser, warm, süß</td><td>+ Herz-Kreislauf, Gehirn, entzündungshemmend; – mögliche Schadstoffe (Quecksilber, Dioxine), Parasiten bei Rohverzehr</td></tr>
+<tr><td>**Linsen (gekocht)**</td><td>116 kcal, 20 g KH, 9 g Protein, 0,4 g Fett</td><td>Folat (ca. 181 µg), B1 (ca. 0,17 mg), B6</td><td>Eisen (ca. 3,3 mg), Kalium (ca. 369 mg), Magnesium, Zink (ca. 1,3 mg)</td><td>0 mg Cholesterin, sehr fettarm; lösliche Ballaststoffe senken LDL</td><td>Erde/Wasser, neutral, süß</td><td>+ Ballaststoffe, pflanzliches Protein, stabiler Blutzucker; – Blähungen (Oligosaccharide), Purine bei Gicht, Eisenaufnahme mit Vitamin C verbessern</td></tr>
+<tr><td>**Mandeln**</td><td>579 kcal, 22 g KH (ca. 12 g Ballaststoffe), 21 g Protein, 50 g Fett</td><td>E (ca. 25 mg), B2 (ca. 1,1 mg), B3</td><td>Magnesium (ca. 270 mg), Kalzium (ca. 270 mg), Kalium (ca. 733 mg), Mangan</td><td>0 mg Cholesterin; ca. 4 g gesättigt, überwiegend einfach ungesättigt; LDL-senkend</td><td>Metall, neutral bis leicht warm, süß (bittere Mandeln: bitter)</td><td>+ Herzgesundheit, Sättigung, Vitamin E; – sehr kalorienreich, Nussallergie, bittere Mandeln enthalten Blausäure-Vorstufen</td></tr>
+<tr><td>**Naturjoghurt (3,5 % Fett)**</td><td>ca. 65 kcal, 4,5 g KH, 3,5 g Protein, 3,5 g Fett</td><td>B2, B12, A, B5</td><td>Kalzium (ca. 120 mg), Phosphor, Kalium, Jod</td><td>ca. 13 mg Cholesterin; ca. 2,3 g gesättigt; LDL-Einfluss gering bis neutral</td><td>Erde, kühl, süß-sauer</td><td>+ Probiotika, Darmflora, bei Laktoseintoleranz oft verträglicher als Milch; – Laktose, gezuckerte Varianten problematisch</td></tr>
+<tr><td>**Olivenöl (nativ extra)**</td><td>884 kcal, 0 g KH, 0 g Protein, 100 g Fett</td><td>E (ca. 14 mg), K1 (ca. 60 µg)</td><td>praktisch keine relevanten Mengen</td><td>0 mg Cholesterin; ca. 14 g gesättigt, ca. 73 g einfach ungesättigt, ca. 11 g mehrfach ungesättigt; senkt LDL im Austausch gegen gesättigte Fette</td><td>Holz, neutral, süß-sauer</td><td>+ Polyphenole, Herz-Kreislauf-Schutz, entzündungshemmend; – sehr energiedicht, Qualitätsverlust bei starkem Erhitzen</td></tr>
+<tr><td>**Orange**</td><td>47 kcal, 12 g KH, 0,9 g Protein, 0,1 g Fett</td><td>C (ca. 53 mg), Folat (ca. 30 µg), B1</td><td>Kalium (ca. 181 mg), Kalzium (ca. 40 mg)</td><td>0 mg Cholesterin, praktisch fettfrei; Pektin und Flavonoide leicht LDL-senkend</td><td>Holz/Erde, kühl, süß-sauer</td><td>+ Immunsystem, bessere Eisenaufnahme, Hesperidin; – Säure belastet bei Reflux und Zahnschmelz</td></tr>
+<tr><td>**Rindfleisch (mager, roh)**</td><td>ca. 130 kcal, 0 g KH, 21 g Protein, 4–5 g Fett</td><td>B12 (ca. 2 µg), B3, B6, B2</td><td>Häm-Eisen (ca. 2,2 mg), Zink (ca. 4,5 mg), Selen, Phosphor</td><td>ca. 60 mg Cholesterin; ca. 2 g gesättigt; fettreiche Stücke erhöhen LDL stärker</td><td>Erde, neutral, süß</td><td>+ gut verfügbares Eisen und Zink, B12; – hoher Konsum von rotem und verarbeitetem Fleisch mit erhöhtem Darmkrebsrisiko assoziiert</td></tr>
+<tr><td>**Salatgurke**</td><td>15 kcal, 3,6 g KH, 0,7 g Protein, 0,1 g Fett</td><td>K1 (ca. 16 µg), C (ca. 3 mg)</td><td>Kalium (ca. 147 mg), wenig Magnesium und Kalzium</td><td>0 mg Cholesterin, praktisch fettfrei; kein relevanter LDL-Einfluss</td><td>Wasser/Erde, kühl bis kalt, süß</td><td>+ sehr wasserreich, kalorienarm, entwässernd; – bei Kälteempfindlichkeit (TCM) in Maßen, Cucurbitacine können bitter sein</td></tr>
+<tr><td>**Spinat (roh)**</td><td>23 kcal, 3,6 g KH, 2,9 g Protein, 0,4 g Fett</td><td>K1 (ca. 480 µg), A (ca. 470 µg RAE), Folat (ca. 194 µg), C</td><td>Eisen (ca. 2,7 mg), Magnesium (ca. 79 mg), Kalium (ca. 558 mg), Kalzium</td><td>0 mg Cholesterin, sehr fettarm; neutral bis leicht günstig für LDL</td><td>Holz, kühl, süß</td><td>+ Augen, Knochen, Blutbildung; – Oxalsäure (Nierensteine, hemmt Kalzium- und Eisenaufnahme), Vitamin K bei Blutverdünnern</td></tr>
+<tr><td>**Tofu (Naturtofu, Richtwert)**</td><td>ca. 125 kcal, 2 g KH, 13 g Protein, 7 g Fett</td><td>Folat, B1, K (geringe Mengen)</td><td>Kalzium (je nach Gerinnungsmittel bis ca. 350 mg), Eisen (ca. 2,7 mg), Magnesium, Mangan</td><td>0 mg Cholesterin; überwiegend ungesättigt, ca. 1 g gesättigt; Sojaprotein senkt LDL leicht</td><td>Erde, kühl, süß</td><td>+ vollständiges pflanzliches Protein, Isoflavone; – Sojaallergie, bei Schilddrüsenerkrankungen mit Arzt abstimmen</td></tr>
+<tr><td>**Tomate**</td><td>18 kcal, 3,9 g KH, 0,9 g Protein, 0,2 g Fett</td><td>C (ca. 14 mg), A (ca. 42 µg), K1, Folat</td><td>Kalium (ca. 237 mg), wenig Magnesium und Eisen</td><td>0 mg Cholesterin, sehr fettarm; Lycopin kann LDL leicht senken</td><td>Holz/Erde, kühl, süß-sauer</td><td>+ Lycopin (Herz-Kreislauf, Prostata), erhitzt mit Öl besser aufnehmbar; – Säure kann Reflux auslösen</td></tr>
+<tr><td>**Vollkornbrot (Weizen/Roggen, Richtwert)**</td><td>ca. 220 kcal, 41 g KH, 7 g Protein, 1,5 g Fett</td><td>B1, B3, B6, Folat, E</td><td>Magnesium, Eisen, Zink, Selen, Phosphor</td><td>0 mg Cholesterin, sehr fettarm; Ballaststoffe leicht LDL-senkend</td><td>Feuer/Erde, kühl bis neutral, süß</td><td>+ Ballaststoffe, Sättigung, Darmgesundheit; – Gluten (Zöliakie, Sensitivität), Salzgehalt je nach Sorte</td></tr>
+<tr><td>**Vollkornreis (gekocht)**</td><td>112 kcal, 23 g KH, 2,3 g Protein, 0,8 g Fett</td><td>B1 (ca. 0,1 mg), B3 (ca. 1,5 mg), B6</td><td>Magnesium (ca. 43 mg), Mangan (ca. 0,9 mg), Phosphor, Selen</td><td>0 mg Cholesterin, fettarm; Ballaststoffe leicht LDL-senkend</td><td>Erde, neutral, süß</td><td>+ Ballaststoffe, stabilere Blutzuckerkurve als Weißreis; – Spuren von anorganischem Arsen, Phytinsäure hemmt Mineralstoffaufnahme</td></tr>
+<tr><td>**Vollmilch (3,5 % Fett)**</td><td>64 kcal, 4,8 g KH, 3,3 g Protein, 3,6 g Fett</td><td>B2 (ca. 0,2 mg), B12 (ca. 0,4 µg), A, etwas D</td><td>Kalzium (ca. 120 mg), Phosphor, Kalium, Jod</td><td>ca. 11 mg Cholesterin; ca. 2,3 g gesättigt; kann LDL leicht erhöhen</td><td>Erde, kühl, süß</td><td>+ Kalzium für Knochen, hochwertiges Protein; – Laktoseintoleranz, Milcheiweißallergie, gesättigte Fette</td></tr>
+<tr><td>**Zwiebel**</td><td>40 kcal, 9 g KH, 1,1 g Protein, 0,1 g Fett</td><td>C (ca. 7 mg), B6 (ca. 0,1 mg), Folat</td><td>Kalium (ca. 146 mg), Mangan, wenig Kalzium</td><td>0 mg Cholesterin, fettarm; Quercetin und Schwefelverbindungen können LDL leicht günstig beeinflussen</td><td>Metall, warm, scharf</td><td>+ Quercetin, antientzündlich, Präbiotika (Inulin); – Blähungen (FODMAPs), Reizdarm-Symptome möglich</td></tr>
+</tbody>
+</table>
+</body></html>
