@@ -113,17 +113,23 @@ footer{margin-top:36px;text-align:center;color:var(--muted);font-size:.8rem}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div>
-      <h1>🌿 Zen Link Manager</h1>
-      <p class="sub" id="count"></p>
-    </div>
-    <div class="tools">
-      <select id="theme" class="themesel" onchange="setTheme(this.value)" aria-label="Design"></select>
-      <button class="ghost icon" onclick="toggleFullscreen()" title="Vollbild" aria-label="Vollbild">⛶</button>
-    </div>
-  </header>
+   <div class="wrap">     
+    <header>
+      <div style="display: flex; align-items: center; gap: 20px; width: 100%;">
+        <figure style="margin: 0; max-width: 120px; flex-shrink: 0;">
+          <img src="favicon.png" alt="Zami" style="width: 100%; height: auto; border-radius: 6px; display: block;">
+          <figcaption style="font-size: 12px; color: #888; margin-top: 6px;">©️ Jo & Zami - 2026.</figcaption>
+        </figure>
+        <div>
+          <h1 style="margin: 0;">🌿 Zen Link Manager</h1>
+          <p class="sub" id="count" style="margin: 6px 0 0 0;"></p>
+        </div>
+        <div class="tools" style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
+          <select id="theme" class="themesel" onchange="setTheme(this.value)" aria-label="Design"></select>
+          <button class="ghost icon" onclick="toggleFullscreen()" title="Vollbild" aria-label="Vollbild">⛶</button>
+        </div>    
+      </div>   
+    </header>
 
   <div class="panel">
     <div class="form">
