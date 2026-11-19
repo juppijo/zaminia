@@ -1,306 +1,400 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🌿 Zen Link Manager</title>
 <link rel="icon" type="image/x-icon" href="favicon.png">
-
 <style>
-:root {
-    --bg: linear-gradient(135deg, #667eea, #764ba2);
-    --card: #ffffff;
-    --text: #333;
-    --muted: #888;
-    --box: #f5f6fa;
-    --link: #667eea;
+:root{
+  --bg:#e8ebe1; --bg2:#d5dccb; --card:#f7f8f3; --ink:#232a21; --muted:#6c7667;
+  --line:#d3d9c9; --accent:#4d7a58; --accent-ink:#fff; --warm:#b5893f; --danger:#b4443a;
+  --shadow:0 1px 2px rgba(35,42,33,.06),0 8px 24px rgba(35,42,33,.08);
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
 }
-
-body.dark {
-    --bg: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    --card: #1e1f26;
-    --text: #e6e6e6;
-    --muted: #aaa;
-    --box: #2a2c35;
-    --link: #8ab4f8;
+body[data-theme="dunkel"]{
+  --bg:#121814; --bg2:#1a231d; --card:#1b231e; --ink:#e3e9de; --muted:#97a392;
+  --line:#2c372f; --accent:#8cc09a; --accent-ink:#10200f; --warm:#d6ad63; --danger:#e07a6f;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
 }
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-    font-family: system-ui, sans-serif;
-    background: var(--bg);
-    min-height: 100vh;
-    padding: 30px;
-    display: flex;
-    justify-content: center;
-    transition: background 0.6s;
+body[data-theme="ocean"]{
+  --bg:#d9ebef; --bg2:#b5dce5; --card:#f3fafb; --ink:#10303a; --muted:#587b85;
+  --line:#bddce3; --accent:#0e7b8e; --accent-ink:#fff; --warm:#dd9c4c; --danger:#b4443a;
 }
-
-.container {
-    width: 100%;
-    max-width: 850px;
-    background: var(--card);
-    border-radius: 22px;
-    padding: 30px;
-    box-shadow: 0 30px 70px rgba(0,0,0,0.35);
-    color: var(--text);
-    transition: background 0.4s, color 0.4s;
+body[data-theme="himmel"]{
+  --bg:#e2effc; --bg2:#c4e0fa; --card:#f8fbff; --ink:#1b2d46; --muted:#657e9c;
+  --line:#cbdff2; --accent:#2c7be0; --accent-ink:#fff; --warm:#eea53a; --danger:#c2453b;
 }
-
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
+body[data-theme="nachtblau"]{
+  --bg:#0a1126; --bg2:#15204a; --card:#121b36; --ink:#e2e8f8; --muted:#8e9bc2;
+  --line:#243258; --accent:#7aa2ff; --accent-ink:#0a1126; --warm:#f2c66d; --danger:#ff8a80;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 28px rgba(0,0,0,.45);
 }
-
-h1 { font-size: 1.6rem; }
-
-header button {
-    margin-left: 8px;
+body[data-theme="sonnenuntergang"]{
+  --bg:#f6e5da; --bg2:#f0c8b0; --card:#fff8f3; --ink:#3a2320; --muted:#8a6a62;
+  --line:#ebd1c3; --accent:#c4533a; --accent-ink:#fff; --warm:#d6932a; --danger:#a63a3a;
 }
-
-.box {
-    background: var(--box);
-    padding: 20px;
-    border-radius: 16px;
-    margin-bottom: 22px;
-    transition: background 0.4s;
+body[data-theme="lavendel"]{
+  --bg:#ebe6f5; --bg2:#d5cbec; --card:#f9f7fd; --ink:#2a2440; --muted:#7a7096;
+  --line:#dbd3ee; --accent:#7a5cc7; --accent-ink:#fff; --warm:#d99a4a; --danger:#b4443a;
 }
-
-.row {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+body[data-theme="kirschbluete"]{
+  --bg:#fbe8ee; --bg2:#f5cbda; --card:#fff8fa; --ink:#3b2230; --muted:#94687b;
+  --line:#efd1dc; --accent:#d1507b; --accent-ink:#fff; --warm:#c99a3e; --danger:#a63a3a;
 }
-
-input {
-    flex: 1;
-    padding: 12px;
-    border-radius: 10px;
-    border: 2px solid transparent;
-    font-size: 14px;
+body[data-theme="sand"]{
+  --bg:#efe6d4; --bg2:#e0d0b0; --card:#fbf7ee; --ink:#38301f; --muted:#8a7d62;
+  --line:#e2d6bb; --accent:#a47a3b; --accent-ink:#fff; --warm:#c0692f; --danger:#a63a3a;
 }
-
-input:focus {
-    outline: none;
-    border-color: var(--link);
-}
-
-button {
-    padding: 12px 18px;
-    border-radius: 10px;
-    border: none;
-    background: var(--link);
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-button.secondary {
-    background: #6c757d;
-}
-
-button.delete {
-    background: #dc3545;
-}
-
-button:hover {
-    filter: brightness(1.1);
-}
-
-ul { list-style: none; }
-
-li {
-    background: var(--box);
-    padding: 14px;
-    border-radius: 14px;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: background 0.4s;
-}
-
-a {
-    flex: 1;
-    color: var(--link);
-    text-decoration: none;
-    word-break: break-all;
-}
-
-.empty {
-    text-align: center;
-    color: var(--muted);
-    padding: 30px;
-    font-style: italic;
-}
+.catcell{display:flex;gap:6px}
+.catcell select{width:auto;max-width:46%;padding:11px 8px}
+.themesel{width:auto;padding:9px 12px;font-weight:600;cursor:pointer}
+.favbtn.onfav{color:var(--warm);border-color:var(--warm)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-padding-top:16px}
+body{font-family:var(--sans);color:var(--ink);min-height:100vh;
+  background:radial-gradient(1200px 600px at 10% -10%,var(--bg2),transparent 70%),var(--bg);
+  transition:background .5s,color .3s;padding:clamp(14px,4vw,40px)}
+.wrap{max-width:980px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:26px;flex-wrap:wrap}
+h1{font-family:var(--serif);font-weight:500;font-size:clamp(1.9rem,5vw,2.8rem);letter-spacing:-.01em;line-height:1.1}
+.sub{color:var(--muted);margin-top:6px;font-size:.95rem}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+button,.btn{font:inherit;font-size:.9rem;font-weight:600;padding:10px 16px;border-radius:12px;border:1px solid transparent;
+  background:var(--accent);color:var(--accent-ink);cursor:pointer;transition:filter .15s,transform .1s}
+button:hover{filter:brightness(1.08)} button:active{transform:scale(.97)}
+button.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+button.ghost:hover{background:var(--card);filter:none}
+button.icon{padding:9px 12px;font-size:1rem}
+button.danger{color:var(--danger)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input,select{font:inherit;font-size:.95rem;padding:11px 14px;border-radius:12px;border:1px solid var(--line);
+  background:var(--card);color:var(--ink);min-width:0;width:100%}
+input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:18px;box-shadow:var(--shadow)}
+.form{display:grid;grid-template-columns:1fr 1.6fr 1fr auto;gap:10px;align-items:center}
+.form .actions{display:flex;gap:8px;flex-wrap:wrap}
+.bar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.bar .search{flex:1;min-width:200px}
+.seg{display:flex;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.seg button{background:transparent;color:var(--muted);border-radius:0;padding:9px 13px}
+.seg button.on{background:var(--card);color:var(--ink)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.chip{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-weight:500;font-size:.85rem}
+.chip.on{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.chip small{opacity:.6;margin-left:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.grid.list{grid-template-columns:1fr;gap:8px}
+.card{position:relative;display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:14px;box-shadow:var(--shadow);transition:border-color .2s,transform .2s}
+.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.card.fav{border-left:4px solid var(--warm)}
+.av{flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-size:1.3rem}
+.main{flex:1;min-width:0;text-decoration:none;color:inherit;display:block}
+.main:focus-visible{outline-offset:6px}
+.name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.host{color:var(--muted);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag{display:inline-block;margin-top:5px;font-size:.75rem;color:var(--accent);border:1px solid var(--line);border-radius:999px;padding:1px 9px}
+.acts{display:flex;gap:2px;opacity:.35;transition:opacity .2s}
+.card:hover .acts,.card:focus-within .acts{opacity:1}
+.acts button{background:transparent;color:var(--ink);padding:6px 8px;font-size:.95rem;border-radius:8px}
+.acts button:hover{background:var(--bg2);filter:none}
+.acts .on{color:var(--warm)}
+.empty{text-align:center;color:var(--muted);padding:46px 10px;font-family:var(--serif);font-size:1.1rem}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,30px);opacity:0;pointer-events:none;
+  background:var(--ink);color:var(--card);padding:12px 18px;border-radius:14px;display:flex;gap:14px;align-items:center;
+  transition:.3s;box-shadow:var(--shadow);z-index:10;max-width:92vw}
+.toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast button{background:transparent;color:var(--warm);padding:2px 6px;border:0}
+footer{margin-top:36px;text-align:center;color:var(--muted);font-size:.8rem}
+@media(max-width:720px){.form{grid-template-columns:1fr}.acts{opacity:1}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
-
 <body>
-
-<div class="container">
-    <header>
-        <h1>🌿 Zen Link Manager</h1>
-        <div>
-            <button onclick="toggleDark()">🌙</button>
-            <button onclick="toggleFullscreen()">⛶</button>
-        </div>
-    </header>
-
-    <div class="box">
-        <div class="row">
-            <input id="name" placeholder="Name (optional)">
-            <input id="url" placeholder="https://…">
-            <button onclick="saveLink()">Speichern</button>
-        </div>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>🌿 Zen Link Manager</h1>
+      <p class="sub" id="count"></p>
     </div>
-
-    <div class="box row">
-        <button class="secondary" onclick="exportLinks()">Export JSON</button>
-        <input type="file" accept=".json" onchange="importLinks(event)">
+    <div class="tools">
+      <select id="theme" class="themesel" onchange="setTheme(this.value)" aria-label="Design"></select>
+      <button class="ghost icon" onclick="toggleFullscreen()" title="Vollbild" aria-label="Vollbild">⛶</button>
     </div>
+  </header>
 
-    <ul id="list"></ul>
+  <div class="panel">
+    <div class="form">
+      <input id="name" placeholder="Name (optional)" aria-label="Name">
+      <input id="url" placeholder="https://…" aria-label="URL" inputmode="url">
+      <div class="catcell"><input id="cat" placeholder="Kategorie (optional)" list="cats" aria-label="Kategorie"><select id="catSel" onchange="pickCat(this.value)" aria-label="Kategorie wählen" hidden></select></div>
+      <datalist id="cats"></datalist>
+      <div class="actions">
+        <button id="favBtn" type="button" class="ghost favbtn" onclick="toggleFormFav()" aria-pressed="false">☆ Favorit</button>
+        <button id="saveBtn" onclick="saveLink()">Speichern</button>
+        <button id="cancelBtn" class="ghost" onclick="cancelEdit()" hidden>Abbrechen</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <input class="search" id="q" type="search" placeholder="Links durchsuchen…" aria-label="Suche" oninput="setQ(this.value)">
+    <button id="favFilter" class="chip" onclick="toggleFavFilter()" aria-pressed="false">☆ Favoriten</button>
+    <div class="seg" role="group" aria-label="Ansicht">
+      <button id="vGrid" onclick="setView('grid')" title="Kacheln">▦</button>
+      <button id="vList" onclick="setView('list')" title="Liste">☰</button>
+    </div>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="grid" id="list"></div>
+
+  <div class="panel" style="margin-top:28px">
+    <div class="bar" style="margin:0">
+      <button onclick="exportStatic()">🌐 Als Webseite speichern (HTML)</button>
+      <button class="ghost" onclick="exportLinks()">Export JSON</button>
+      <label class="btn ghost" style="cursor:pointer">Import JSON
+        <input type="file" accept=".json" onchange="importLinks(event)" hidden>
+      </label>
+    </div>
+    <p class="sub" style="margin-top:10px">Die Webseite ist eine einzelne, unveränderliche HTML-Datei mit Suche und Kategorien – ideal zum Teilen oder Hochladen.</p>
+  </div>
+  <footer>Deine Links bleiben lokal in diesem Browser gespeichert.</footer>
 </div>
+<div class="toast" id="toast"><span id="toastMsg"></span><button id="toastBtn" hidden></button></div>
 
 <script>
-const STORAGE_KEY = "zen_links";
-const THEME_KEY = "zen_dark";
+const STORAGE_KEY="zen_links", THEME_KEY="zen_dark", VIEW_KEY="zen_view";
 
-const defaultLinks = [
-    { name: "Physiker", url: "https://juppijo.github.io/WRZT/Physiker" },
-    { name: "Zaminia LisaK", url: "https://juppijo.github.io/zaminia/LisaK" },
-    { name: "Links List", url: "https://juppijo.github.io/zaminia/" },
-    { name: "WRZT Doppelspalt", url: "https://juppijo.github.io/WRZT/wave_double_slit_f" },
-    { name: 'Zami Zen Seiten', url:'https://sites.google.com/view/juppijo/startseite' },
-    { name: 'Zaminia Playlist', url:'https://www.youtube.com/playlist?list=PLDhnqFLorBbyTJEfdwYJPcFSPyBTjnAmr' }
-    
+const defaultLinks=[
+  {name:"Physiker",url:"https://juppijo.github.io/WRZT/Physiker",cat:"Physik"},
+  {name:"WRZT Doppelspalt",url:"https://juppijo.github.io/WRZT/wave_double_slit_f",cat:"Physik"},
+  {name:"Zaminia LisaK",url:"https://juppijo.github.io/zaminia/LisaK",cat:"Zaminia"},
+  {name:"Links List",url:"https://juppijo.github.io/zaminia/",cat:"Zaminia"},
+  {name:"Zami Zen Seiten",url:"https://sites.google.com/view/juppijo/startseite",cat:"Zen"},
+  {name:"Zaminia Playlist",url:"https://www.youtube.com/playlist?list=PLDhnqFLorBbyTJEfdwYJPcFSPyBTjnAmr",cat:"Video"}
 ];
 
-let links = [];
-let editIndex = null;
+const THEMES=[["moos","🌿 Moos"],["ocean","🌊 Ocean"],["himmel","☁️ Himmel"],["nachtblau","🌌 Nachtblau"],["sonnenuntergang","🌅 Sonnenuntergang"],["lavendel","💜 Lavendel"],["kirschbluete","🌸 Kirschblüte"],["sand","🏜️ Sand"],["dunkel","🌑 Dunkel"]];
+function fillThemes(sel){sel.innerHTML=THEMES.map(t=>'<option value="'+t[0]+'">'+t[1]+'</option>').join("")}
+let formFav=false, favOnly=false;
+let links=[], q="", cat="", view="grid", editId=null, lastDeleted=null, toastTimer;
 
-/* ---------- INIT ---------- */
-function init() {
-    if (localStorage.getItem(THEME_KEY) === "dark") {
-        document.body.classList.add("dark");
-    }
-    const saved = localStorage.getItem(STORAGE_KEY);
-    links = saved ? JSON.parse(saved) : defaultLinks;
-    save();
-    render();
+/* ---------- Shared helpers (also embedded in the exported page) ---------- */
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function host(u){try{return new URL(u).hostname.replace(/^www\./,"")}catch(e){return u}}
+function hue(s){let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))%360;return h}
+function cardHTML(l,editable){
+  const title=l.name||host(l.url), h=hue(host(l.url));
+  return '<div class="card'+(l.fav?' fav':'')+'">'+
+    '<div class="av" style="background:hsl('+h+' 32% 40%)" aria-hidden="true">'+esc(title.charAt(0).toUpperCase())+'</div>'+
+    '<a class="main" href="'+esc(l.url)+'" target="_blank" rel="noopener noreferrer">'+
+      '<div class="name">'+esc(title)+'</div><div class="host">'+esc(host(l.url))+'</div>'+
+      (l.cat?'<span class="tag">'+esc(l.cat)+'</span>':'')+'</a>'+
+    (editable?'<div class="acts">'+
+      '<button class="'+(l.fav?'on':'')+'" onclick="toggleFav(\''+l.id+'\')" title="Favorit" aria-label="Favorit">'+(l.fav?'★':'☆')+'</button>'+
+      '<button onclick="editLink(\''+l.id+'\')" title="Bearbeiten" aria-label="Bearbeiten">✎</button>'+
+      '<button onclick="removeLink(\''+l.id+'\')" title="Löschen" aria-label="Löschen">✕</button></div>':'')+
+  '</div>';
+}
+function matches(l,q,cat){
+  if(cat&&(l.cat||"")!==cat)return false;
+  q=q.trim().toLowerCase();
+  return !q||((l.name||"")+" "+l.url+" "+(l.cat||"")).toLowerCase().includes(q);
+}
+function chipsHTML(items,cat){
+  const counts={};items.forEach(l=>{if(l.cat)counts[l.cat]=(counts[l.cat]||0)+1});
+  const names=Object.keys(counts).sort((a,b)=>a.localeCompare(b));
+  if(!names.length)return"";
+  return [""].concat(names).map(n=>'<button class="chip'+(n===cat?' on':'')+'" data-cat="'+esc(n)+'">'+
+    (n||"Alle")+'<small>'+(n?counts[n]:items.length)+'</small></button>').join("");
+}
+function sorted(items){return items.map((l,i)=>[l,i]).sort((a,b)=>(!!b[0].fav-!!a[0].fav)||a[1]-b[1]).map(x=>x[0])}
+
+/* ---------- Init ---------- */
+function uid(){return Math.random().toString(36).slice(2,9)}
+function init(){
+  let t=localStorage.getItem(THEME_KEY);
+  if(t==="dark")t="dunkel";else if(t==="light")t="moos";
+  if(!THEMES.some(x=>x[0]===t))t=matchMedia("(prefers-color-scheme: dark)").matches?"dunkel":"moos";
+  fillThemes(document.getElementById("theme"));setTheme(t);
+  view=localStorage.getItem(VIEW_KEY)||"grid";
+  try{links=JSON.parse(localStorage.getItem(STORAGE_KEY))||defaultLinks.map(l=>({...l}))}catch(e){links=defaultLinks.map(l=>({...l}))}
+  links.forEach(l=>{if(!l.id)l.id=uid()});
+  save();render();
+}
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(links))}
+
+/* ---------- Theme, fullscreen, view ---------- */
+function setTheme(t){
+  document.body.dataset.theme=t;
+  document.getElementById("theme").value=t;
+  localStorage.setItem(THEME_KEY,t);
+}
+function toggleFullscreen(){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}
+function setView(v){view=v;localStorage.setItem(VIEW_KEY,v);render()}
+function toggleFavFilter(){favOnly=!favOnly;render()}
+function setQ(v){q=v;renderList()}
+
+/* ---------- Render ---------- */
+function render(){
+  document.getElementById("count").textContent=links.length+(links.length===1?" Link":" Links")+" · lokal gespeichert";
+  const known=[...new Set(links.map(l=>l.cat).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  const cs=document.getElementById("catSel");
+  cs.hidden=!known.length;
+  cs.innerHTML='<option value="">▾ wählen</option>'+known.map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join("");
+  document.getElementById("cats").innerHTML=[...new Set(links.map(l=>l.cat).filter(Boolean))].map(c=>'<option value="'+esc(c)+'">').join("");
+  document.getElementById("vGrid").className=view==="grid"?"on":"";
+  document.getElementById("vList").className=view==="list"?"on":"";
+  const ff=document.getElementById("favFilter");
+  ff.classList.toggle("on",favOnly);ff.textContent=(favOnly?"★":"☆")+" Favoriten";ff.setAttribute("aria-pressed",favOnly);
+  const chips=document.getElementById("chips");
+  if(cat&&!links.some(l=>l.cat===cat))cat="";
+  chips.innerHTML=chipsHTML(links,cat);
+  chips.onclick=e=>{const b=e.target.closest(".chip");if(b){cat=b.dataset.cat;render()}};
+  renderList();
+}
+function renderList(){
+  const el=document.getElementById("list");
+  el.className="grid"+(view==="list"?" list":"");
+  const items=sorted(links).filter(l=>matches(l,q,cat)&&(!favOnly||l.fav));
+  el.innerHTML=items.length?items.map(l=>cardHTML(l,true)).join(""):
+    '<div class="empty" style="grid-column:1/-1">'+(links.length?"Nichts gefunden 🍃":"Noch keine Links – füge oben deinen ersten hinzu 🌱")+'</div>';
 }
 
-/* ---------- THEME ---------- */
-function toggleDark() {
-    document.body.classList.toggle("dark");
-    localStorage.setItem(
-        THEME_KEY,
-        document.body.classList.contains("dark") ? "dark" : "light"
-    );
+/* ---------- Add / edit / delete ---------- */
+function normalizeUrl(u){
+  u=u.trim();if(!/^[a-z][a-z0-9+.-]*:/i.test(u))u="https://"+u;
+  try{const p=new URL(u);return /^https?:$|^mailto:$/.test(p.protocol)?u:null}catch(e){return null}
+}
+function saveLink(){
+  const name=document.getElementById("name"),url=document.getElementById("url"),c=document.getElementById("cat");
+  if(!url.value.trim()){url.focus();return toast("Bitte eine URL eingeben 🌸")}
+  const u=normalizeUrl(url.value);
+  if(!u){url.focus();return toast("Diese URL ist nicht gültig.")}
+  const data={name:name.value.trim(),url:u,cat:c.value.trim(),fav:formFav};
+  if(editId){const l=links.find(x=>x.id===editId);Object.assign(l,data);toast("Link aktualisiert")}
+  else{links.push({id:uid(),...data});toast("Link gespeichert")}
+  cancelEdit(true);save();render();
+}
+function editLink(id){
+  const l=links.find(x=>x.id===id);editId=id;
+  document.getElementById("name").value=l.name||"";
+  document.getElementById("url").value=l.url;
+  document.getElementById("cat").value=l.cat||"";
+  formFav=!!l.fav;updateFavBtn();
+  document.getElementById("saveBtn").textContent="Änderung speichern";
+  document.getElementById("cancelBtn").hidden=false;
+  document.getElementById("name").focus();scrollTo({top:0,behavior:"smooth"});
+}
+function cancelEdit(silent){
+  editId=null;formFav=false;updateFavBtn();["name","url","cat"].forEach(i=>document.getElementById(i).value="");
+  document.getElementById("saveBtn").textContent="Speichern";
+  document.getElementById("cancelBtn").hidden=true;
+}
+function pickCat(v){if(v){document.getElementById("cat").value=v}document.getElementById("catSel").value=""}
+function toggleFormFav(){formFav=!formFav;updateFavBtn()}
+function updateFavBtn(){
+  const b=document.getElementById("favBtn");
+  b.textContent=formFav?"★ Favorit":"☆ Favorit";
+  b.classList.toggle("onfav",formFav);b.setAttribute("aria-pressed",formFav);
+}
+function toggleFav(id){const l=links.find(x=>x.id===id);l.fav=!l.fav;save();render()}
+function removeLink(id){
+  const i=links.findIndex(x=>x.id===id);
+  lastDeleted={l:links[i],i};links.splice(i,1);save();render();
+  toast("Link gelöscht","Rückgängig",()=>{links.splice(lastDeleted.i,0,lastDeleted.l);save();render()});
 }
 
-/* ---------- FULLSCREEN ---------- */
-function toggleFullscreen() {
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-    } else {
-        document.exitFullscreen();
-    }
+/* ---------- Toast ---------- */
+function toast(msg,label,fn){
+  const t=document.getElementById("toast"),b=document.getElementById("toastBtn");
+  document.getElementById("toastMsg").textContent=msg;
+  b.hidden=!label;b.textContent=label||"";
+  b.onclick=()=>{fn&&fn();t.classList.remove("show")};
+  t.classList.add("show");clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove("show"),label?6000:2600);
 }
 
-/* ---------- STORAGE ---------- */
-function save() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(links));
+/* ---------- Export / import ---------- */
+function download(text,name,type){
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([text],{type}));
+  a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function exportLinks(){
+  download(JSON.stringify(links.map(({id,...r})=>r),null,2),"zen-links.json","application/json");
+}
+function importLinks(e){
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(!Array.isArray(data)||data.some(x=>!x||typeof x.url!=="string"))throw 0;
+      const incoming=data.map(x=>({id:uid(),name:x.name||"",url:x.url,cat:x.cat||"",fav:!!x.fav}));
+      if(links.length&&confirm("Bestehende Links ersetzen?\nOK = ersetzen, Abbrechen = zusammenführen")){links=incoming}
+      else{const have=new Set(links.map(l=>l.url));links=links.concat(incoming.filter(l=>!have.has(l.url)))}
+      save();render();toast("Import abgeschlossen");
+    }catch(err){toast("Ungültige Datei – bitte eine Zen-Links-JSON wählen 🌿")}
+    e.target.value="";
+  };
+  r.readAsText(file);
 }
 
-/* ---------- RENDER ---------- */
-function render() {
-    const ul = document.getElementById("list");
-    if (!links.length) {
-        ul.innerHTML = `<div class="empty">Noch keine Links 🌱</div>`;
-        return;
-    }
-
-    ul.innerHTML = links.map((l, i) => `
-        <li>
-            <a href="${l.url}" target="_blank">${l.name || l.url}</a>
-            <button onclick="editLink(${i})">Edit</button>
-            <button class="delete" onclick="removeLink(${i})">✕</button>
-        </li>
-    `).join("");
+/* ---------- Static page export ---------- */
+function staticMain(DATA,THEME){
+  let q="",cat="",favOnly=false;
+  const list=document.getElementById("list"),chips=document.getElementById("chips"),
+        none=document.getElementById("none");
+  const sel=document.getElementById("theme");
+  fillThemes(sel);sel.value=THEME;document.body.dataset.theme=THEME;
+  document.getElementById("fs").onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
+  const fb=document.getElementById("favOnly");
+  if(!DATA.some(l=>l.fav))fb.hidden=true;
+  fb.onclick=()=>{favOnly=!favOnly;fb.classList.toggle("on",favOnly);fb.textContent=(favOnly?"★":"☆")+" Favoriten";draw()};
+  sel.onchange=()=>{document.body.dataset.theme=sel.value};
+  document.getElementById("q").oninput=e=>{q=e.target.value;draw()};
+  chips.innerHTML=chipsHTML(DATA,"");
+  chips.onclick=e=>{
+    const b=e.target.closest(".chip");if(!b)return;
+    cat=b.dataset.cat;
+    chips.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c.dataset.cat===cat));
+    draw();
+  };
+  function draw(){
+    const items=sorted(DATA).filter(l=>matches(l,q,cat)&&(!favOnly||l.fav));
+    list.innerHTML=items.map(l=>cardHTML(l,false)).join("");
+    none.hidden=items.length>0;
+  }
+  draw();
 }
-
-/* ---------- ADD / EDIT ---------- */
-function saveLink() {
-    const name = document.getElementById("name");
-    const url = document.getElementById("url");
-
-    if (!url.value.trim()) return alert("Bitte URL eingeben 🌸");
-
-    const data = { name: name.value.trim(), url: url.value.trim() };
-
-    if (editIndex !== null) {
-        links[editIndex] = data;
-        editIndex = null;
-    } else {
-        links.push(data);
-    }
-
-    name.value = "";
-    url.value = "";
-    save();
-    render();
-}
-
-function editLink(i) {
-    document.getElementById("name").value = links[i].name;
-    document.getElementById("url").value = links[i].url;
-    editIndex = i;
-}
-
-function removeLink(i) {
-    if (confirm("Link löschen?")) {
-        links.splice(i, 1);
-        save();
-        render();
-    }
-}
-
-/* ---------- EXPORT / IMPORT ---------- */
-function exportLinks() {
-    const blob = new Blob(
-        [JSON.stringify(links, null, 2)],
-        { type: "application/json" }
-    );
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "zen-links.json";
-    a.click();
-}
-
-function importLinks(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = ev => {
-        try {
-            links = JSON.parse(ev.target.result);
-            save();
-            render();
-        } catch {
-            alert("Ungültige Datei 🌿");
-        }
-    };
-    reader.readAsText(file);
+function exportStatic(){
+  if(!links.length)return toast("Es gibt noch keine Links zum Speichern.");
+  const title=prompt("Titel der Webseite:","Meine Links");
+  if(title===null)return;
+  const t=title.trim()||"Meine Links";
+  const data=JSON.stringify(sorted(links).map(({id,...r})=>r)).replace(/</g,"\\u003c");
+  const css=document.querySelector("style").textContent;
+  const js="const THEMES="+JSON.stringify(THEMES)+";\n"+[fillThemes,esc,host,hue,cardHTML,matches,chipsHTML,sorted].map(f=>f.toString()).join("\n")+
+    "\n("+staticMain.toString()+")(JSON.parse('__DATA__'),"+JSON.stringify(document.body.dataset.theme)+");";
+  const jsData=js.replace("__DATA__",()=>data.replace(/\\/g,"\\\\").replace(/'/g,"\\'"));
+  const html='<!DOCTYPE html>\n<html lang="de"><head><meta charset="UTF-8">'+
+    '<meta name="viewport" content="width=device-width, initial-scale=1.0">'+
+    '<title>'+esc(t)+'</title><style>'+css+'</style></head><body><div class="wrap">'+
+    '<header><div><h1>🌿 '+esc(t)+'</h1><p class="sub">'+links.length+' Links</p></div>'+
+    '<div class="tools"><select class="themesel" id="theme" aria-label="Design"></select><button class="ghost icon" id="fs" title="Vollbild" aria-label="Vollbild">⛶</button></div></header>'+
+    '<div class="bar"><input class="search" id="q" type="search" placeholder="Links durchsuchen…" aria-label="Suche"><button class="chip" id="favOnly" aria-pressed="false">☆ Favoriten</button></div>'+
+    '<div class="chips" id="chips"></div><div class="grid" id="list"></div>'+
+    '<div class="empty" id="none" hidden>Nichts gefunden 🍃</div>'+
+    '<footer>Erstellt am '+new Date().toLocaleDateString("de-DE")+' mit Zen Link Manager</footer></div>'+
+    '<script>'+jsData+'<\/script></body></html>';
+  download(html,"links-webseite.html","text/html");
+  toast("Webseite gespeichert: links-webseite.html");
 }
 
 init();
 </script>
-
 </body>
 </html>
